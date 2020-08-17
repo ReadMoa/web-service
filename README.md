@@ -183,3 +183,19 @@ This step can be done as part of deployment but is separated for clarity.
 
 For more details about using Cloud Run see http://cloud.run.
 Review other [Python on Cloud Run samples](../../../run/).
+
+## Clean up 
+
+1. Stop the web server by CTRL+c.
+
+2. Deactive virtual environment.
+
+```sh
+deactivate
+```
+
+3. Clean the virtualenv.
+
+```sh
+rm -rf env
+```

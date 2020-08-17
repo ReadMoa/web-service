@@ -1,0 +1,59 @@
+<!--
+Copyright 2018 Google LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<html lang="en">
+<head>
+    <title>Posts to read</title>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+<body>
+<nav class="red lighten-1">
+    <div class="nav-wrapper">
+        <a href="#" class="brand-logo center">ReadMoa</a>
+    </div>
+</nav>
+<div class="section">
+    <div class="center">
+        <h4>
+            {% if num_posts == 0 %}
+                No new posts available!
+            {% else %}
+               {{num_posts}} posts have been submitted recently. 
+            {% endif %}
+        </h4>
+    </div>
+    <h4 class="header center">Recent Posts</h4>
+    <ul class="container collection center">
+        {% for post in recent_posts %}
+            <li class="collection-item avatar">
+                <a href="{{post.post_url}}">
+				<span class="title">
+					<b>{{post.title}}</b>
+				</span>
+                <div><img src="{{post.main_image_url}}" width="360"></div>
+                <span class="description">
+                    {{post.description}}
+                </span>
+                </a>
+                <p>was posted at {{post.submission_time}}</p>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+</body>
+</html>

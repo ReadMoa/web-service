@@ -287,6 +287,10 @@ def page_privacy():
     return render_template(
         "privacy.html", privacy_admin=privacy_admin)
 
+@app.route("/terms", methods=["GET"])
+def page_terms():
+    return render_template("terms.html")
+
 @app.route("/", methods=["POST"])
 def save_vote():
     # Get the team and time the vote was cast.

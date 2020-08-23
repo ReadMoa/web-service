@@ -291,10 +291,12 @@ def page_privacy():
 def page_terms():
     return render_template("terms.html")
 
+# TODO: Use a more efficient way to serve static files e.g. nginx.
 @app.route("/favicon.ico", methods=["GET"])
 def resource_favicon():
     return send_from_directory("static", "favicon.ico")
 
+# TODO: Use a more efficient way to serve static files e.g. nginx.
 @app.route('/images/<path:path>')
 def send_js(path):
     return send_from_directory('static/images', path)

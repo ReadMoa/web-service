@@ -16,7 +16,7 @@ import datetime
 import logging
 import os
 
-from flask import Flask, render_template, request, Response
+from flask import Flask, render_template, request, Response, send_from_directory
 import sqlalchemy
 
 
@@ -290,6 +290,14 @@ def page_privacy():
 @app.route("/terms", methods=["GET"])
 def page_terms():
     return render_template("terms.html")
+
+@app.route("/favicon.ico", methods=["GET"])
+def resource_favicon():
+    return send_from_directory("static", "favicon.ico")
+
+@app.route('/images/<path:path>')
+def send_js(path):
+    return send_from_directory('static/images', path)
 
 @app.route("/", methods=["POST"])
 def save_vote():

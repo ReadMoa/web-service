@@ -250,6 +250,11 @@ def create_tables():
             "application logs for more details.",
         )
 
+@app.before_first_request
+def google_service_init():
+    # no-op
+    return
+
 @app.route("/", methods=["GET"])
 def index():
     posts = []
@@ -270,19 +275,17 @@ def index():
                 "main_image_url": row[3],
                 "description": row[4]})
 
-        #stmt = sqlalchemy.text(
-        #    "SELECT COUNT(vote_id) FROM votes WHERE candidate=:candidate"
-        #)
-        ## Count number of votes for tabs
-        #tab_result = conn.execute(stmt, candidate="TABS").fetchone()
-        #tab_count = tab_result[0]
-        ## Count number of votes for spaces
-        #space_result = conn.execute(stmt, candidate="SPACES").fetchone()
-        #space_count = space_result[0]
-
     return render_template(
         "list.html", recent_posts=posts, num_posts=len(posts))
 
+@app.route("/privacy", methods=["GET"])
+def page_privacy():
+    privacy_admin = {}
+    privacy_admin["name"] = os.environ["PRIVACY_ADMIN_NAME"]
+    privacy_admin["email"] = os.environ["PRIVACY_ADMIN_EMAIL"]
+    privacy_admin["phone"] = os.environ["PRIVACY_ADMIN_PHONE"]
+    return render_template(
+        "privacy.html", privacy_admin=privacy_admin)
 
 @app.route("/", methods=["POST"])
 def save_vote():

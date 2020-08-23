@@ -17,8 +17,13 @@ runtime: python37
 # Remember - storing secrets in plaintext is potentially unsafe. Consider using
 # something like https://cloud.google.com/secret-manager/docs/overview to help keep
 # secrets secret.
+#
+#  CLOUD_SQL_CONNECTION_NAME: fanjang:asia-northeast3:main=tcp:3306
 env_variables:
-  CLOUD_SQL_CONNECTION_NAME: {enter your SQL connection name}
-  DB_USER: {enter DB USER}
-  DB_PASS: {enter password}
-  DB_NAME: {enter DB NAME}
+  CLOUD_SQL_CONNECTION_NAME: fanjang:asia-northeast3:main
+  DB_USER: root
+  DB_PASS: test
+  DB_NAME: main
+  PRIVACY_ADMIN_NAME: 이만복
+  PRIVACY_ADMIN_EMAIL: +1-408-598-1852
+  PRIVACY_ADMIN_PHONE: manbok.lee.readmoa @ gmail.com

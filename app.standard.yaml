@@ -20,10 +20,11 @@ runtime: python37
 #
 #  CLOUD_SQL_CONNECTION_NAME: fanjang:asia-northeast3:main=tcp:3306
 env_variables:
-  CLOUD_SQL_CONNECTION_NAME: fanjang:asia-northeast3:main
-  DB_USER: root
-  DB_PASS: test
-  DB_NAME: main
-  PRIVACY_ADMIN_NAME: 이만복
-  PRIVACY_ADMIN_EMAIL: +1-408-598-1852
-  PRIVACY_ADMIN_PHONE: manbok.lee.readmoa @ gmail.com
+  CLOUD_SQL_CONNECTION_NAME: {enter your SQL connection name}
+  DB_USER: {enter DB USER}
+  DB_PASS: {enter password}
+  DB_NAME: {enter DB NAME}
+  PRIVACY_ADMIN_NAME: {privacy admin name}
+  PRIVACY_ADMIN_EMAIL: {privacy admin email}
+  PRIVACY_ADMIN_PHONE: {privacy admin phone}
+

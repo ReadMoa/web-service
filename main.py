@@ -17,13 +17,14 @@ import logging
 import os
 
 from flask import Flask, render_template, request, Response, send_from_directory
+from google.oauth2 import id_token
+from google.auth.transport import requests
 import sqlalchemy
 
+OAUTH_CLIENT_ID = '460880639448-1t9uj6pc9hcr9dvfmvm7sqm03vv3k2th.apps.googleusercontent.com'
 
 app = Flask(__name__)
-
 logger = logging.getLogger()
-
 
 def init_connection_engine():
     db_config = {
@@ -300,6 +301,34 @@ def resource_favicon():
 @app.route('/images/<path:path>')
 def send_js(path):
     return send_from_directory('static/images', path)
+
+@app.route('/tokensignin', methods=['POST'])
+def tokensignin():
+    idtoken = request.form['idtoken']
+    # (Receive token by HTTPS POST)
+    # ...
+
+    try:
+        # Specify the CLIENT_ID of the app that accesses the backend:
+        idinfo = id_token.verify_oauth2_token(
+                idtoken, requests.Request(), OAUTH_CLIENT_ID)
+
+        # Or, if multiple clients access the backend server:
+        # idinfo = id_token.verify_oauth2_token(token, requests.Request())
+        # if idinfo['aud'] not in [CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]:
+        #     raise ValueError('Could not verify audience.')
+
+        # If auth request is from a G Suite domain:
+        # if idinfo['hd'] != GSUITE_DOMAIN_NAME:
+        #     raise ValueError('Wrong hosted domain.')
+
+        # ID token is valid. Get the user's Google Account ID from the decoded token.
+        userid = idinfo['sub']
+        logger.warning('user id=%s', userid)
+    except ValueError:
+        # Invalid token
+        pass
+    return idinfo
 
 @app.route("/", methods=["POST"])
 def save_vote():

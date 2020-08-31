@@ -1,6 +1,6 @@
 <html lang="en">
 <head>
-    <title>Posts to read</title>
+    <title>Add a post</title>
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
@@ -26,30 +26,28 @@
 <div class="section">
     <div class="center">
         <h4>
-            {% if num_posts == 0 %}
-                No new posts available!
-            {% else %}
-               {{num_posts}} posts have been submitted recently. 
-            {% endif %}
+        Add a post
         </h4>
     </div>
-    <h4 class="header center">Recent Posts</h4>
-    <ul class="container collection center">
-        {% for post in recent_posts %}
-            <li class="collection-item avatar">
-                <a href="{{post.post_url}}">
-				<span class="title">
-					<b>{{post.title}}</b>
-				</span>
-                <div><img src="{{post.main_image_url}}" width="360"></div>
-                <span class="description">
-                    {{post.description}}
-                </span>
-                </a>
-                <p>was posted at {{post.submission_time}}</p>
-            </li>
-        {% endfor %}
-    </ul>
+    <form class="col s12" method="POST" action="/add_post">
+        <div class="row">
+            <div class="input-field col s12">
+                <input id="url" type="text" name="url" class="validate">
+                <label for="url">URL</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-field col s12">
+                <textarea id="comment" name="comment" class="materialize-textarea"></textarea>
+                <label for="comment">Comment</label>
+            </div>
+        </div>
+        
+        <input id="idtoken" type="hidden" name="idtoken">
+        <button class="btn waves-effect waves-light right" type="submit" name="action">Submit
+            <i class="material-icons right">send</i>
+        </button>
+    </form>
 </div>
 
 <div class="g-signin2" data-onsuccess="onSignIn"></div>
@@ -64,13 +62,7 @@
 
         // Verify ID Token.
         var id_token = googleUser.getAuthResponse().id_token;
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/tokensignin');
-        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        xhr.onload = function() {
-              console.log('Signed in as: ' + xhr.responseText);
-        };
-        xhr.send('idtoken=' + id_token);
+        document.getElementById("idtoken").value = id_token;
     }
 </script>
 </body>

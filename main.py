@@ -17,9 +17,13 @@ import hashlib
 import logging
 import os
 
+# For parsing a webpage.
+from bs4 import BeautifulSoup
 from flask import Flask, render_template, request, redirect, Response, send_from_directory
 from google.oauth2 import id_token
-from google.auth.transport import requests
+from google.auth.transport import requests as auth_requests
+# For crawling a webpage.
+import requests
 import sqlalchemy
 
 OAUTH_CLIENT_ID = '460880639448-1t9uj6pc9hcr9dvfmvm7sqm03vv3k2th.apps.googleusercontent.com'
@@ -312,7 +316,7 @@ def tokensignin():
     try:
         # Specify the CLIENT_ID of the app that accesses the backend:
         idinfo = id_token.verify_oauth2_token(
-                idtoken, requests.Request(), OAUTH_CLIENT_ID)
+                idtoken, auth_requests.Request(), OAUTH_CLIENT_ID)
 
         # Or, if multiple clients access the backend server:
         # idinfo = id_token.verify_oauth2_token(token, requests.Request())
@@ -338,6 +342,23 @@ def add_post():
 @app.route("/add_post", methods=["POST"])
 def add_post_submit():
     url = request.form["url"]
+    title = ''
+    main_image = ''
+    description = ''
+
+    # Crawl and parse a webpage.
+    source_code = requests.get(url).text
+    soup = BeautifulSoup(source_code, 'html.parser')
+    for each_text in soup.findAll('meta'):
+        if each_text.get('property') == 'og:title':
+            title = each_text.get('content')
+        if each_text.get('property') == 'og:image':
+            main_image = each_text.get('content')
+        if each_text.get('property') == 'og:url':
+            url = each_text.get('content')
+        if each_text.get('property') == 'og:description':
+            description = each_text.get('content')
+
     url_hash = hashlib.sha512(url.encode()).hexdigest()[0:64]
     comment = request.form["comment"]
     idtoken = request.form["idtoken"]
@@ -346,7 +367,7 @@ def add_post_submit():
     userid = ''
     try:
         idinfo = id_token.verify_oauth2_token(
-                idtoken, requests.Request(), OAUTH_CLIENT_ID)
+                idtoken, auth_requests.Request(), OAUTH_CLIENT_ID)
         userid = idinfo['sub']
         logger.warning('user id=%s', userid)
     except ValueError:
@@ -354,9 +375,12 @@ def add_post_submit():
         pass
 
     stmt = sqlalchemy.text(
-        "INSERT INTO posts_serving (post_url_hash, post_url, submission_time, "
-        "                   user_id) "
-        " VALUES (:url_hash, :url, :time_cast, :userid)"
+        "INSERT INTO posts_serving "
+        "  (post_url_hash, post_url, submission_time, user_id, "
+        "   title, main_image_url, description) "
+        " VALUES "
+        "  (:url_hash, :url, :time_cast, :userid, "
+        "   :title, :main_image, :description)"
     )
 
     logger.warning(stmt)
@@ -365,7 +389,9 @@ def add_post_submit():
         with db.connect() as conn:
             conn.execute(
                     stmt, url_hash=url_hash, url=url,
-                    time_cast=time_cast, userid=userid)
+                    time_cast=time_cast, userid=userid,
+                    title=title, main_image=main_image,
+                    description=description)
     except Exception as e:
         logger.exception(e)
         return Response(

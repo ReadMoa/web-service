@@ -13,10 +13,11 @@
 # limitations under the License.
 
 import datetime
+import hashlib
 import logging
 import os
 
-from flask import Flask, render_template, request, Response, send_from_directory
+from flask import Flask, render_template, request, redirect, Response, send_from_directory
 from google.oauth2 import id_token
 from google.auth.transport import requests
 import sqlalchemy
@@ -148,7 +149,7 @@ def create_tables():
         # Create posts_serving if not exist.
         conn.execute(
             "CREATE TABLE IF NOT EXISTS posts_serving ("
-            "post_url_hash CHAR(50) NOT NULL, "
+            "post_url_hash CHAR(64) NOT NULL, "
             "post_url  TEXT(2084) NOT NULL, "
             "submission_time DATETIME, "
             "title TEXT(1024), "
@@ -299,7 +300,7 @@ def resource_favicon():
 
 # TODO: Use a more efficient way to serve static files e.g. nginx.
 @app.route('/images/<path:path>')
-def send_js(path):
+def serve_image(path):
     return send_from_directory('static/images', path)
 
 @app.route('/tokensignin', methods=['POST'])
@@ -330,43 +331,49 @@ def tokensignin():
         pass
     return idinfo
 
-@app.route("/", methods=["POST"])
-def save_vote():
-    # Get the team and time the vote was cast.
-    team = request.form["team"]
-    time_cast = datetime.datetime.utcnow()
-    # Verify that the team is one of the allowed options
-    if team != "TABS" and team != "SPACES":
-        logger.warning(team)
-        return Response(response="Invalid team specified.", status=400)
+@app.route("/add_post", methods=["GET"])
+def add_post():
+    return render_template("add_post.html")
 
-    # [START cloud_sql_mysql_sqlalchemy_connection]
-    # Preparing a statement before hand can help protect against injections.
-    stmt = sqlalchemy.text(
-        "INSERT INTO votes (time_cast, candidate)" " VALUES (:time_cast, :candidate)"
-    )
+@app.route("/add_post", methods=["POST"])
+def add_post_submit():
+    url = request.form["url"]
+    url_hash = hashlib.sha512(url.encode()).hexdigest()[0:64]
+    comment = request.form["comment"]
+    idtoken = request.form["idtoken"]
+    time_cast = datetime.datetime.utcnow()
+
+    userid = ''
     try:
-        # Using a with statement ensures that the connection is always released
-        # back into the pool at the end of statement (even if an error occurs)
+        idinfo = id_token.verify_oauth2_token(
+                idtoken, requests.Request(), OAUTH_CLIENT_ID)
+        userid = idinfo['sub']
+        logger.warning('user id=%s', userid)
+    except ValueError:
+        # Invalid token
+        pass
+
+    stmt = sqlalchemy.text(
+        "INSERT INTO posts_serving (post_url_hash, post_url, submission_time, "
+        "                   user_id) "
+        " VALUES (:url_hash, :url, :time_cast, :userid)"
+    )
+
+    logger.warning(stmt)
+
+    try:
         with db.connect() as conn:
-            conn.execute(stmt, time_cast=time_cast, candidate=team)
+            conn.execute(
+                    stmt, url_hash=url_hash, url=url,
+                    time_cast=time_cast, userid=userid)
     except Exception as e:
-        # If something goes wrong, handle the error in this section. This might
-        # involve retrying or adjusting parameters depending on the situation.
-        # [START_EXCLUDE]
         logger.exception(e)
         return Response(
             status=500,
-            response="Unable to successfully cast vote! Please check the "
-            "application logs for more details.",
+            response="INSERT operation failed.",
         )
-        # [END_EXCLUDE]
-    # [END cloud_sql_mysql_sqlalchemy_connection]
 
-    return Response(
-        status=200,
-        response="Vote successfully cast for '{}' at time {}!".format(team, time_cast),
-    )
+    return redirect("/", code=301)
 
 
 if __name__ == "__main__":

@@ -19,7 +19,7 @@ import os
 
 # For parsing a webpage.
 from bs4 import BeautifulSoup
-from flask import Flask, render_template, request, redirect, Response, send_from_directory
+from flask import Flask, jsonify, render_template, request, redirect, Response, send_from_directory
 from google.oauth2 import id_token
 from google.auth.transport import requests as auth_requests
 # For crawling a webpage.
@@ -284,6 +284,11 @@ def index():
     return render_template(
         "list.html", recent_posts=posts, num_posts=len(posts))
 
+# Test with React.
+@app.route("/test/list", methods=["GET"])
+def test_list():
+    return render_template("test_list.html")
+
 @app.route("/privacy", methods=["GET"])
 def page_privacy():
     privacy_admin = {}
@@ -400,6 +405,101 @@ def add_post_submit():
         )
 
     return redirect("/", code=301)
+
+@app.route('/api/list_posts')
+def api_list_posts():
+    posts = []
+    with db.connect() as conn:
+        # Execute the query and fetch all results
+        recent_posts = conn.execute(
+            "SELECT post_url, title, submission_time, main_image_url, description, "
+            "       user_display_name, user_email, user_photo_url, user_id, user_provider_id "
+            "FROM posts_serving "
+            "ORDER BY submission_time DESC LIMIT 10"
+        ).fetchall()
+        # Convert the results into a list of dicts representing votes
+        for row in recent_posts:
+            posts.append({
+                "post_url": row[0],
+                "title": row[1],
+                "submission_time": row[2],
+                "main_image_url": row[3],
+                "description": row[4]})
+    return jsonify(posts=posts)
+
+# JSON data format for request.
+# {
+#   "url": "..."
+#   "comment": "..."
+#   "idtoken": "..."
+# }
+# TODO: Refactor the duplicate code with add_post_submit().
+# TODO: Didn't test this function.
+@app.route('/api/add_post', methods=['POST'])
+def api_add_post():
+    post = request.get_json()
+    url = post["url"]
+    comment = post["comment"]
+    idtoken = post["idtoken"]
+
+    title = ''
+    main_image = ''
+    description = ''
+
+    # Crawl and parse a webpage.
+    source_code = requests.get(url).text
+    soup = BeautifulSoup(source_code, 'html.parser')
+    for each_text in soup.findAll('meta'):
+        if each_text.get('property') == 'og:title':
+            title = each_text.get('content')
+        if each_text.get('property') == 'og:image':
+            main_image = each_text.get('content')
+        if each_text.get('property') == 'og:url':
+            url = each_text.get('content')
+        if each_text.get('property') == 'og:description':
+            description = each_text.get('content')
+
+    url_hash = hashlib.sha512(url.encode()).hexdigest()[0:64]
+    comment = request.form["comment"]
+    idtoken = request.form["idtoken"]
+    time_cast = datetime.datetime.utcnow()
+
+    userid = ''
+    try:
+        idinfo = id_token.verify_oauth2_token(
+                idtoken, auth_requests.Request(), OAUTH_CLIENT_ID)
+        userid = idinfo['sub']
+        logger.warning('user id=%s', userid)
+    except ValueError:
+        # Invalid token
+        pass
+
+    stmt = sqlalchemy.text(
+        "INSERT INTO posts_serving "
+        "  (post_url_hash, post_url, submission_time, user_id, "
+        "   title, main_image_url, description) "
+        " VALUES "
+        "  (:url_hash, :url, :time_cast, :userid, "
+        "   :title, :main_image, :description)"
+    )
+
+    logger.warning(stmt)
+
+    try:
+        with db.connect() as conn:
+            conn.execute(
+                    stmt, url_hash=url_hash, url=url,
+                    time_cast=time_cast, userid=userid,
+                    title=title, main_image=main_image,
+                    description=description)
+    except Exception as e:
+        logger.exception(e)
+        return Response(
+            status=500,
+            response="INSERT operation failed.",
+        )
+
+    return jsonify(post=post)
 
 
 if __name__ == "__main__":

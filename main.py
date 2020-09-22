@@ -20,6 +20,7 @@ import os
 # For parsing a webpage.
 from bs4 import BeautifulSoup
 from flask import Flask, jsonify, render_template, request, redirect, Response, send_from_directory
+from flask_cors import CORS
 from google.oauth2 import id_token
 from google.auth.transport import requests as auth_requests
 # For crawling a webpage.
@@ -29,6 +30,7 @@ import sqlalchemy
 OAUTH_CLIENT_ID = '460880639448-1t9uj6pc9hcr9dvfmvm7sqm03vv3k2th.apps.googleusercontent.com'
 
 app = Flask(__name__)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 logger = logging.getLogger()
 
 def init_connection_engine():

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
@@ -13,32 +13,33 @@ import CardMedia from "@material-ui/core/CardMedia";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 
+const API_SERVER_PATH = "http://127.0.0.1:8080/api/";
+
 const useStyles = makeStyles({
   root: {
     maxWidth: 345,
   },
 });
 
-export default function ImgMediaCard() {
+export default function ImgMediaCard(props) {
   const classes = useStyles();
 
   return (
-    <Card className={classes.root}>
-      <CardActionArea>
+    <Card>
+      <CardActionArea className={classes.root}>
         <CardMedia
           component="img"
           alt="Contemplative Reptile"
           height="140"
-          image="/images/readmoa-logo-200x200.png"
+          image={props.imageUrl}
           title="Contemplative Reptile"
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
-            Lizard
+            {props.title}
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
-            Lizards are a widespread group of squamate reptiles, with over 6,000
-            species, ranging across all continents except Antarctica
+            {props.description}
           </Typography>
         </CardContent>
       </CardActionArea>
@@ -54,7 +55,76 @@ export default function ImgMediaCard() {
   );
 }
 
-ReactDOM.render(<ImgMediaCard />, document.getElementById("root"));
+function CardList() {
+  const [posts, setPosts] = useState([]);
+  const [error, setError] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch(API_SERVER_PATH + "list_posts", {
+      method: "GET",
+    })
+      .then((response) => response.json())
+      .then(
+        (response) => {
+          //console.log(response.posts);
+          setPosts(response.posts);
+          setIsLoaded(true);
+        },
+        (error) => {
+          setIsLoaded(true);
+          setError(error);
+        }
+      )
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  } else if (!isLoaded) {
+    return <div>Loading...</div>;
+  } else {
+    console.log(posts);
+    return (
+      <div>
+        <ImgMediaCard
+          title={posts[0].title}
+          description={posts[0].description}
+          imageUrl={posts[0].main_image_url}
+        />
+        <ImgMediaCard
+          title={posts[1].title}
+          description={posts[1].description}
+          imageUrl={posts[1].main_image_url}
+        />
+        <ImgMediaCard
+          title={posts[2].title}
+          description={posts[2].description}
+          imageUrl={posts[2].main_image_url}
+        />
+        <ImgMediaCard
+          title={posts[3].title}
+          description={posts[3].description}
+          imageUrl={posts[3].main_image_url}
+        />
+        <ImgMediaCard
+          title={posts[4].title}
+          description={posts[4].description}
+          imageUrl={posts[4].main_image_url}
+        />{" "}
+        <ImgMediaCard
+          title={posts[5].title}
+          description={posts[5].description}
+          imageUrl={posts[5].main_image_url}
+        />
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(<CardList />, document.getElementById("root"));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

@@ -4,6 +4,7 @@ import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 
+import { createMuiTheme } from "@material-ui/core/styles";
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
@@ -21,7 +22,7 @@ const useStyles = makeStyles({
   },
 });
 
-export default function ImgMediaCard(props) {
+function ImgMediaCard(props) {
   const classes = useStyles();
 
   return (
@@ -29,10 +30,10 @@ export default function ImgMediaCard(props) {
       <CardActionArea className={classes.root}>
         <CardMedia
           component="img"
-          alt="Contemplative Reptile"
+          alt={props.title}
           height="140"
           image={props.imageUrl}
-          title="Contemplative Reptile"
+          title={props.title}
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="h2">
@@ -45,10 +46,10 @@ export default function ImgMediaCard(props) {
       </CardActionArea>
       <CardActions>
         <Button size="small" color="primary">
-          Share
-        </Button>
-        <Button size="small" color="primary">
           Learn More
+        </Button>
+        <Button size="small" color="primary" href={props.postUrl}>
+          Read
         </Button>
       </CardActions>
     </Card>
@@ -93,31 +94,37 @@ function CardList() {
           title={posts[0].title}
           description={posts[0].description}
           imageUrl={posts[0].main_image_url}
+          postUrl={posts[0].post_url}
         />
         <ImgMediaCard
           title={posts[1].title}
           description={posts[1].description}
           imageUrl={posts[1].main_image_url}
+          postUrl={posts[1].post_url}
         />
         <ImgMediaCard
           title={posts[2].title}
           description={posts[2].description}
           imageUrl={posts[2].main_image_url}
+          postUrl={posts[2].post_url}
         />
         <ImgMediaCard
           title={posts[3].title}
           description={posts[3].description}
           imageUrl={posts[3].main_image_url}
+          postUrl={posts[3].post_url}
         />
         <ImgMediaCard
           title={posts[4].title}
           description={posts[4].description}
           imageUrl={posts[4].main_image_url}
+          postUrl={posts[4].post_url}
         />{" "}
         <ImgMediaCard
           title={posts[5].title}
           description={posts[5].description}
           imageUrl={posts[5].main_image_url}
+          postUrl={posts[5].post_url}
         />
       </div>
     );

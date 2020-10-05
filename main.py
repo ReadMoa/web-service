@@ -437,9 +437,13 @@ def api_list_posts():
 # }
 # TODO: Refactor the duplicate code with add_post_submit().
 # TODO: Didn't test this function.
-@app.route('/api/add_post', methods=['POST'])
+@app.route('/api/add_post', methods=["POST"])
 def api_add_post():
-    post = request.get_json()
+    post = request.json
+    
+    logger.warning('SEE HERE')
+    logger.warning('add post=%s', request.get_json())
+
     url = post["url"]
     comment = post["comment"]
     idtoken = post["idtoken"]
@@ -462,8 +466,6 @@ def api_add_post():
             description = each_text.get('content')
 
     url_hash = hashlib.sha512(url.encode()).hexdigest()[0:64]
-    comment = request.form["comment"]
-    idtoken = request.form["idtoken"]
     time_cast = datetime.datetime.utcnow()
 
     userid = ''

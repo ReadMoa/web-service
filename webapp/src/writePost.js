@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Redirect, useHistory } from "react-router";
+import React, { useState } from "react";
+import { useHistory } from "react-router";
 import "./writePost.css";
 
 import { makeStyles } from "@material-ui/core/styles";

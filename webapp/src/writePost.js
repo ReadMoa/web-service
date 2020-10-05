@@ -8,6 +8,7 @@ import Button from "@material-ui/core/Button";
 
 // The base path for ReadMoa APIs.
 const API_SERVER_PATH = "http://127.0.0.1:8080/api/";
+// const API_SERVER_PATH = "/api/";
 
 const useStyles = makeStyles((theme) => ({
   root: {

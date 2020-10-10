@@ -26,6 +26,7 @@ from google.auth.transport import requests as auth_requests
 # For crawling a webpage.
 import requests
 import sqlalchemy
+from urllib.parse import urlparse
 
 OAUTH_CLIENT_ID = '460880639448-1t9uj6pc9hcr9dvfmvm7sqm03vv3k2th.apps.googleusercontent.com'
 
@@ -346,6 +347,17 @@ def tokensignin():
 def add_post():
     return render_template("add_post.html")
 
+# Returns a full URL from og:url.
+def getFullUrl(parentUrl, openGraphUrl):
+    openGraphUrl = openGraphUrl.strip()
+    if openGraphUrl.startswith('http'):
+        return openGraphUrl
+    elif openGraphUrl.startswith('/'):
+        p = urlparse(parentUrl)
+        return p.scheme + '://' + p.netloc + openGraphUrl
+    else:
+        return ''
+
 @app.route("/add_post", methods=["POST"])
 def add_post_submit():
     url = request.form["url"]
@@ -362,7 +374,17 @@ def add_post_submit():
         if each_text.get('property') == 'og:image':
             main_image = each_text.get('content')
         if each_text.get('property') == 'og:url':
-            url = each_text.get('content')
+            og_url = each_text.get('content')
+            fullUrl = getFullUrl(url, og_url)
+            if fullUrl:
+                url = fullUrl
+                logger.info('New URL from og:url: ' + url)
+            else:
+                logger.warning('Failed to generate a full URL from ' + og_url)
+                return Response(
+                    status=500,
+                    response="INSERT operation failed.",
+                )
         if each_text.get('property') == 'og:description':
             description = each_text.get('content')
 
@@ -461,7 +483,17 @@ def api_add_post():
         if each_text.get('property') == 'og:image':
             main_image = each_text.get('content')
         if each_text.get('property') == 'og:url':
-            url = each_text.get('content')
+            og_url = each_text.get('content')
+            fullUrl = getFullUrl(url, og_url)
+            if fullUrl:
+                url = fullUrl
+                logger.info('New URL from og:url: ' + url)
+            else:
+                logger.warning('Failed to generate a full URL from ' + og_url)
+                return Response(
+                    status=500,
+                    response="INSERT operation failed.",
+                )
         if each_text.get('property') == 'og:description':
             description = each_text.get('content')
 

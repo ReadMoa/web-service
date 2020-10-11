@@ -2,6 +2,7 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
+import Box from "@material-ui/core/Box";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
@@ -11,26 +12,30 @@ import WritePost from "./writePost";
 function MainApp() {
   return (
     <Router>
-      <div>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/write_post">Write post</Link>
-            </li>
-          </ul>
-        </nav>
+      <div style={{ width: "100%" }}>
+        <Box display="flex" justifyContent="center">
+          <nav>
+            <ul>
+              <li>
+                <Link to="/">Home</Link>
+              </li>
+              <li>
+                <Link to="/write_post">Write post</Link>
+              </li>
+            </ul>
+          </nav>
+        </Box>
 
-        <Switch>
-          <Route path="/write_post">
-            <WritePost />
-          </Route>
-          <Route path="/">
-            <ListPosts />
-          </Route>
-        </Switch>
+        <Box display="flex" justifyContent="center">
+          <Switch>
+            <Route path="/write_post">
+              <WritePost />
+            </Route>
+            <Route path="/">
+              <ListPosts />
+            </Route>
+          </Switch>
+        </Box>
       </div>
     </Router>
   );

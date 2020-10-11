@@ -49,37 +49,35 @@ function WritePost() {
   const [idtoken, setIdtoken] = useState("");
 
   return (
-    <Box width="100%" justifyContent="center">
-      <div className="App" onSubmit={onSubmit}>
-        <form className={classes.root} noValidate autoComplete="off">
-          <div width="100%">
-            <TextField
-              id="outlined-basic"
-              label="URL"
-              variant="outlined"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              fullWidth
-            />
-          </div>
-          <div width="100%">
-            <TextField
-              id="outlined-basic"
-              label="Comment"
-              variant="outlined"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              fullWidth
-            />
-          </div>
-          <div width="100%">
-            <Button variant="contained" type="submit">
-              Submit
-            </Button>
-          </div>
-        </form>
-      </div>
-    </Box>
+    <div className="App" onSubmit={onSubmit}>
+      <form className={classes.root} noValidate autoComplete="off">
+        <div width="100%">
+          <TextField
+            id="outlined-basic"
+            label="URL"
+            variant="outlined"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            fullWidth
+          />
+        </div>
+        <div width="100%">
+          <TextField
+            id="outlined-basic"
+            label="Comment"
+            variant="outlined"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            fullWidth
+          />
+        </div>
+        <div width="100%">
+          <Button variant="contained" type="submit">
+            Submit
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }
 

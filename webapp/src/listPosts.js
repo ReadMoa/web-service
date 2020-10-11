@@ -19,7 +19,7 @@ const API_SERVER_PATH = "http://127.0.0.1:8080/api/";
 
 const useStyles = makeStyles({
   root: {
-    maxWidth: "410",
+    maxWidth: "380px",
   },
 });
 
@@ -88,9 +88,8 @@ function ListPosts() {
   } else if (!isLoaded) {
     return <div>Loading...</div>;
   } else {
-    console.log(posts);
     return (
-      <Box width="100%" justifyContent="center">
+      <Box width="380px">
         <ImgMediaCard
           title={posts[0].title}
           description={posts[0].description}

@@ -3,13 +3,14 @@
 import React, { useEffect, useState } from "react";
 import "./listPosts.css";
 
+import Box from "@material-ui/core/Box";
+import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
-import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 
 // The base path for ReadMoa APIs.
@@ -18,7 +19,7 @@ const API_SERVER_PATH = "http://127.0.0.1:8080/api/";
 
 const useStyles = makeStyles({
   root: {
-    maxWidth: 345,
+    maxWidth: "100%",
   },
 });
 
@@ -31,7 +32,7 @@ function ImgMediaCard(props) {
         <CardMedia
           component="img"
           alt={props.title}
-          height="140"
+          height="200"
           image={props.imageUrl}
           title={props.title}
         />
@@ -89,7 +90,7 @@ function ListPosts() {
   } else {
     console.log(posts);
     return (
-      <div>
+      <Box width="100%" justifyContent="center">
         <ImgMediaCard
           title={posts[0].title}
           description={posts[0].description}
@@ -126,7 +127,7 @@ function ListPosts() {
           imageUrl={posts[5].main_image_url}
           postUrl={posts[5].post_url}
         />
-      </div>
+      </Box>
     );
   }
 }

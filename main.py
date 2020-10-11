@@ -439,7 +439,7 @@ def api_list_posts():
             "SELECT post_url, title, submission_time, main_image_url, description, "
             "       user_display_name, user_email, user_photo_url, user_id, user_provider_id "
             "FROM posts_serving "
-            "ORDER BY submission_time DESC LIMIT 10"
+            "ORDER BY submission_time DESC LIMIT 100"
         ).fetchall()
         # Convert the results into a list of dicts representing votes
         for row in recent_posts:

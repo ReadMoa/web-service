@@ -19,7 +19,7 @@ const API_SERVER_PATH = "http://127.0.0.1:8080/api/";
 
 const useStyles = makeStyles({
   root: {
-    maxWidth: "100%",
+    maxWidth: "410",
   },
 });
 

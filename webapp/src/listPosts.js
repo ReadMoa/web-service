@@ -83,51 +83,24 @@ function ListPosts() {
       });
   }, []);
 
+  const items = [];
   if (error) {
     return <div>Error: {error.message}</div>;
   } else if (!isLoaded) {
     return <div>Loading...</div>;
   } else {
-    return (
-      <Box width="380px">
+    for (const [, value] of posts.slice(0, 50).entries()) {
+      items.push(
         <ImgMediaCard
-          title={posts[0].title}
-          description={posts[0].description}
-          imageUrl={posts[0].main_image_url}
-          postUrl={posts[0].post_url}
+          title={value.title}
+          description={value.description}
+          imageUrl={value.main_image_url}
+          postUrl={value.post_url}
         />
-        <ImgMediaCard
-          title={posts[1].title}
-          description={posts[1].description}
-          imageUrl={posts[1].main_image_url}
-          postUrl={posts[1].post_url}
-        />
-        <ImgMediaCard
-          title={posts[2].title}
-          description={posts[2].description}
-          imageUrl={posts[2].main_image_url}
-          postUrl={posts[2].post_url}
-        />
-        <ImgMediaCard
-          title={posts[3].title}
-          description={posts[3].description}
-          imageUrl={posts[3].main_image_url}
-          postUrl={posts[3].post_url}
-        />
-        <ImgMediaCard
-          title={posts[4].title}
-          description={posts[4].description}
-          imageUrl={posts[4].main_image_url}
-          postUrl={posts[4].post_url}
-        />{" "}
-        <ImgMediaCard
-          title={posts[5].title}
-          description={posts[5].description}
-          imageUrl={posts[5].main_image_url}
-          postUrl={posts[5].post_url}
-        />
-      </Box>
-    );
+      );
+    }
+
+    return <Box width="380px">{items}</Box>;
   }
 }
 

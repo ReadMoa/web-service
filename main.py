@@ -146,6 +146,14 @@ db = init_connection_engine()
 
 @app.before_first_request
 def create_tables():
+    try:
+      import googleclouddebugger
+      googleclouddebugger.enable(
+        breakpoint_enable_canary=True
+      )
+    except ImportError:
+      pass
+
     # Create tables (if they don't already exist)
     with db.connect() as conn:
         # clean up all the tables.

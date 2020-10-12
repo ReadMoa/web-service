@@ -21,13 +21,16 @@ const useStyles = makeStyles({
   root: {
     maxWidth: "380px",
   },
+  box: {
+    margin: "2px",
+  },
 });
 
 function ImgMediaCard(props) {
   const classes = useStyles();
 
   return (
-    <Card>
+    <Card className={classes.box}>
       <CardActionArea className={classes.root}>
         <CardMedia
           component="img"

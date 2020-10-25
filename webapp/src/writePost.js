@@ -6,9 +6,7 @@ import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 
-// The base path for ReadMoa APIs.
-const API_SERVER_PATH = "http://127.0.0.1:8080/api/";
-// const API_SERVER_PATH = "/api/";
+import * as Constants from "./constants.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,7 +22,7 @@ function WritePost() {
   const history = useHistory();
 
   const onSubmit = (e) => {
-    fetch(API_SERVER_PATH + "add_post", {
+    fetch(Constants.API_SERVER_PATH + "add_post", {
       method: "POST",
       mode: "cors",
       headers: {

@@ -92,9 +92,10 @@ function ListPosts() {
   } else if (!isLoaded) {
     return <div>Loading...</div>;
   } else {
-    for (const [, value] of posts.slice(0, 50).entries()) {
+    for (const [index, value] of posts.slice(0, 50).entries()) {
       items.push(
         <ImgMediaCard
+          key={index.toString()}
           title={value.title}
           description={value.description}
           imageUrl={value.main_image_url}

@@ -13,9 +13,7 @@ import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
 
-// The base path for ReadMoa APIs.
-const API_SERVER_PATH = "http://127.0.0.1:8080/api/";
-// const API_SERVER_PATH = "/api/";
+import * as Constants from "./constants.js";
 
 const useStyles = makeStyles({
   root: {
@@ -66,7 +64,7 @@ function ListPosts() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    fetch(API_SERVER_PATH + "list_posts", {
+    fetch(Constants.API_SERVER_PATH + "list_posts", {
       method: "GET",
     })
       .then((response) => response.json())

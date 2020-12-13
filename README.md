@@ -19,6 +19,12 @@ name.
 [instructions](https://cloud.google.com/sql/docs/mysql/connect-external-app#4_if_required_by_your_authentication_method_create_a_service_account).
 Download a JSON key to use to authenticate your connection. 
 
+## Download source code for Read Moa web server and the React client.
+
+```bash
+git clone https://github.com/ReadMoa/web-service.git
+```
+
 ## Running locally
 
 To run this application locally, download and install the `cloud_sql_proxy` by
@@ -99,12 +105,17 @@ Note: Saving credentials in environment variables is convenient, but not secure 
 secure solution such as [Secret Manager](https://cloud.google.com/secret-manager/docs/overview) to
 help keep secrets safe.
 
-Then use this command to launch the proxy in the background:
+Then use this command to launch the proxy in the background (assuming `cloud_sql_proxy` is located outside of Read Moa source code directory):
 ```bash
 ./cloud_sql_proxy -dir=$DB_SOCKET_DIR --instances=$INSTANCE_CONNECTION_NAME --credential_file=$GOOGLE_APPLICATION_CREDENTIALS &
 ```
 
 ### Testing the application
+
+Move to the root of the Read Moa source code directory.
+```bash
+cd web-service
+```
 
 Next, setup install the requirements into a virtual enviroment:
 ```bash
@@ -113,12 +124,18 @@ source env/bin/activate
 pip install -r requirements.txt
 ```
 
-Finally, start the application:
+Start the server application (mostly for /api/):
 ```bash
 python readmoa.py
 ```
 
-Navigate towards `http://127.0.0.1:8080` to verify your application is running correctly.
+Start the React client:
+```bash
+cd webapp
+npm start
+```
+
+Navigate towards `http://127.0.0.1:3000` to verify your application is running correctly.
 
 ## Google App Engine Standard
 
@@ -130,6 +147,7 @@ variables into the runtime.
 
 Next, the following command will deploy the application to your Google Cloud project:
 ```bash
+npm run-script build
 gcloud app deploy app.standard.yaml
 ```
 

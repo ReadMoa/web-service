@@ -30,9 +30,17 @@ handlers:
   - url: /static
     static_dir: webapp/build/static
 
-  - url: /(.*\.(json|ico|js))$
+  - url: /(.*\.png)$
     static_files: webapp/build/\1
-    upload: webapp/build/.*\.(json|ico|js)$
+    upload: webapp/build/.*\.(png)$
+
+  - url: /favicon.ico
+    static_files: webapp/build/favicon.ico
+    upload: webapp/build/favicon.ico
+
+  - url: /(.*\.(json|js))$
+    static_files: webapp/build/\1
+    upload: webapp/build/.*\.(json|js)$
 
   - url: /api/add_post
     script: auto

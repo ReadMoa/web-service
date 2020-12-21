@@ -29,7 +29,7 @@ function ImgMediaCard(props) {
 
   return (
     <Card className={classes.box}>
-      <CardActionArea className={classes.root}>
+      <CardActionArea className={classes.root} href={props.postUrl}>
         <CardMedia
           component="img"
           alt={props.title}

@@ -9,10 +9,11 @@ import sys
 import time
 
 # Uncomment to output logging messages.
-logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+#logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logger = logging.getLogger()
 
 RSS_FEED_FILE = "feeds.txt"
+MAX_SUMMARY_LENGTH = 150
 
 # TODO: Move this function to a common directory.
 def url_to_hashkey(url):
@@ -174,6 +175,114 @@ def fetch_rss(url):
 
     return rss_doc.content
 
+def read_rss(rss_content):
+    """Parses RSS XML content and returns a list of entries.
+
+    Parses an input RSS XML content and returns a list of content entries.
+
+    Args:
+      rss_content: A text string of RSS XML content.
+
+    Returns:
+      A list of dictionaries mapping attribute names to values.
+
+      [{'title': 'foo', 'link': 'https://example.com/'},
+       {'title': 'bar', 'link': 'https://example.com/another'}
+      ]
+    """
+    soup = BeautifulSoup(rss_content, "xml")
+    
+    content_list = []
+    num_entries = 0
+    if soup.rss:
+        for i in soup.findAll("item"):
+            #DEBUG
+            logger.info("RSS LINK: %s", i.link)
+
+            url = i.link.text
+            if not url:
+                continue
+
+            # TODO: Remove this limit when there is a solution to display for
+            #       Naver blog image.
+            if (url.startswith("https://blog.naver.com")
+                or url.startswith("http://blog.naver.com")):
+                continue
+            
+            updated = ''
+            if not i.pubDate:
+                updated = i.pubdate.text
+            else:
+                updated = i.pubDate.text
+
+            author = ""
+            if not i.author:
+                author = i.find("dc:creator").get_text()
+
+            num_entries += 1
+            content_list.append({
+                "key": url_to_hashkey(url),
+                "title": i.title.text,
+                "updated": updated,
+                "link": url,
+                "author": author,
+                "summary": i.description.text,
+                "main_image": fetch_main_image_link(url),
+                })
+
+            # TODO: Remove this limit when the test is done.
+            if num_entries > 3:
+                break
+
+    elif soup.feed:
+        for i in soup.find_all("entry"):
+            url = i.find("link")["href"]
+            # TODO: Remove this limit when there is a solution to display for
+            #       Naver blog image.
+            if (url.startswith("https://blog.naver.com")
+                or url.startswith("http://blog.naver.com")):
+                continue
+            
+            num_entries += 1
+            content_list.append({
+                "key": url_to_hashkey(url),
+                "title": i.find("title").get_text(),
+                "updated": i.find("updated").get_text(),
+                "link": url,
+                "author": i.find("author").find("name").get_text(),
+                "summary": i.find("summary").get_text(),
+                "main_image": fetch_main_image_link(url),
+                })
+
+            # TODO: Remove this limit when the test is done.
+            if num_entries > 3:
+                break
+    
+    logger.info("Number of entries: %d", len(content_list));
+    return content_list
+
+def extract_from_summary(rss_summary_text):
+    """Extracts summary text from a RSS summary record.
+
+    Truncates if the text exceeds the threshold.
+
+    Args:
+      rss_summary_text: A text from <summary>...</summary>
+
+    Returns:
+      An extracted string from the RSS summary record.
+    """
+    summary_soup = BeautifulSoup(rss_summary_text, "html.parser")
+    text = summary_soup.find_all(text=True)
+    summary = ""
+    for t in text:
+        summary += "{} ".format(t)
+        if len(summary) > MAX_SUMMARY_LENGTH:
+            break
+
+    logger.info("Extracted summary: %s", summary[:MAX_SUMMARY_LENGTH])
+    return summary[:MAX_SUMMARY_LENGTH]
+
 def fetch_main_image_link(page_url):
     """Fetch the main image link from the input page.
 
@@ -231,15 +340,13 @@ def add_content_to_database(parsed_content):
         "   :user_email, :title, :main_image, :description)"
     )
 
-    logger.warning(stmt)
-
     try:
         with db.connect() as conn:
             for record in parsed_content:
                 url_hash = record["key"]
                 url = record["link"]
                 title = record["title"]
-                description = record["summary"]
+                description = extract_from_summary(record["summary"])
                 main_image = record["main_image"]
                 time_cast = datetime.datetime.utcnow()
                 user_email = "admin@readmoa.net"
@@ -247,6 +354,19 @@ def add_content_to_database(parsed_content):
                 # TODO: Add 'author' field in the database and use this info.
                 author = record["author"]
 
+                # Check if the post already exists.
+                post = conn.execute(
+                    "SELECT post_url_hash, post_url, submission_time "
+                    "FROM posts_serving "
+                    "WHERE post_url_hash = '" + record["key"] + "'"
+                ).fetchall()
+
+                if (len(post) > 0):
+                    post_url = post[0][1]
+                    logging.info("Already exists in posts_serving: %s",
+                            post_url)
+                    continue
+            
                 conn.execute(
                         stmt, url_hash=url_hash, url=url,
                         time_cast=time_cast, userid=userid,
@@ -257,52 +377,6 @@ def add_content_to_database(parsed_content):
     except Exception as e:
         logger.exception(e)
 
-def read_rss(rss_content):
-    """Parses RSS XML content and returns a list of entries.
-
-    Parses an input RSS XML content and returns a list of content entries.
-
-    Args:
-      rss_content: A text string of RSS XML content.
-
-    Returns:
-      A list of dictionaries mapping attribute names to values.
-
-      [{'title': 'foo', 'link': 'https://example.com/'},
-       {'title': 'bar', 'link': 'https://example.com/another'}
-      ]
-    """
-    soup = BeautifulSoup(rss_content, "lxml")
-    
-    content_list = []
-    num_entries = 0
-    for i in soup.find_all("entry"):
-        url = i.find("link")["href"]
-        # TODO: Remove this limit when there is a solution to display for
-        #       Naver blog image.
-        if (url.startswith("https://blog.naver.com")
-            or url.startswith("http://blog.naver.com")):
-            continue
-        
-        num_entries += 1
-
-        content_list.append({
-            "key": url_to_hashkey(url),
-            "title": i.find("title").get_text(),
-            "updated": i.find("updated").get_text(),
-            "link": url,
-            "author": i.find("author").find("name").get_text(),
-            "summary": i.find("summary").get_text(),
-            "main_image": fetch_main_image_link(url),
-            })
-
-        # TODO: Remove this limit when the test is done.
-        if num_entries > 3:
-            break
-    
-    logger.info("Number of entries: %d", len(content_list));
-    return content_list
-
 def main():
     feed_path = os.path.join(os.path.dirname(__file__), RSS_FEED_FILE)
     for feed_url in read_feed_file(feed_path):
@@ -311,6 +385,9 @@ def main():
         for record in parsed_content:
             logger.info("Incoming link: Key - %s, Main image - %s", record["key"], record["main_image"])
         add_content_to_database(parsed_content)
+
+        print("RSS processing completed for ", feed_url)
+    print("The full RSS import completed.")
     
 
 if __name__ == "__main__":

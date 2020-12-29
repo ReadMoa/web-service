@@ -27,6 +27,7 @@ from google.auth.transport import requests as auth_requests
 import requests
 import sqlalchemy
 from urllib.parse import urlparse
+from util import url as url_util
 
 OAUTH_CLIENT_ID = '460880639448-1t9uj6pc9hcr9dvfmvm7sqm03vv3k2th.apps.googleusercontent.com'
 
@@ -396,8 +397,8 @@ def add_post_submit():
         if each_text.get('property') == 'og:description':
             description = each_text.get('content')
 
-    url_hash = hashlib.sha512(url.encode()).hexdigest()[0:64]
-    comment = request.form["comment"]
+    url_hash = url_util.url_to_hashkey(url)
+    _comment = request.form["comment"]
     idtoken = request.form["idtoken"]
     time_cast = datetime.datetime.utcnow()
 
@@ -475,7 +476,7 @@ def api_add_post():
     logger.warning('add post=%s', request.get_json())
 
     url = post["url"]
-    comment = post["comment"]
+    _comment = post["comment"]
     idtoken = post["idtoken"]
 
     title = ''
@@ -505,7 +506,7 @@ def api_add_post():
         if each_text.get('property') == 'og:description':
             description = each_text.get('content')
 
-    url_hash = hashlib.sha512(url.encode()).hexdigest()[0:64]
+    url_hash = url_util.url_to_hashkey(url)
     time_cast = datetime.datetime.utcnow()
 
     userid = ''

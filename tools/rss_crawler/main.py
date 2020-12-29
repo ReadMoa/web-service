@@ -1,31 +1,19 @@
 from bs4 import BeautifulSoup
+from util import url as url_util
 import datetime
-import hashlib
 import logging
 import os
 import requests
 import sqlalchemy
-import sys
 import time
 
 # Uncomment to output logging messages.
+#import sys
 #logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 logger = logging.getLogger()
 
 RSS_FEED_FILE = "feeds.txt"
 MAX_SUMMARY_LENGTH = 150
-
-# TODO: Move this function to a common directory.
-def url_to_hashkey(url):
-    """Generate a 64 bit hash key from a URL string.
-
-    Args:
-      url: A URL string.
-
-    Returns:
-      A 64 bit hash key.
-    """
-    return hashlib.sha512(url.encode()).hexdigest()[0:64]
 
 # TODO: Move these DB related functions to a common directory.
 def init_connection_engine():
@@ -221,7 +209,7 @@ def read_rss(rss_content):
 
             num_entries += 1
             content_list.append({
-                "key": url_to_hashkey(url),
+                "key": url_util.url_to_hashkey(url),
                 "title": i.title.text,
                 "updated": updated,
                 "link": url,
@@ -245,7 +233,7 @@ def read_rss(rss_content):
             
             num_entries += 1
             content_list.append({
-                "key": url_to_hashkey(url),
+                "key": url_util.url_to_hashkey(url),
                 "title": i.find("title").get_text(),
                 "updated": i.find("updated").get_text(),
                 "link": url,
@@ -258,7 +246,7 @@ def read_rss(rss_content):
             if num_entries > 3:
                 break
     
-    logger.info("Number of entries: %d", len(content_list));
+    logger.info("Number of entries: %d", len(content_list))
     return content_list
 
 def extract_from_summary(rss_summary_text):
@@ -352,7 +340,7 @@ def add_content_to_database(parsed_content):
                 user_email = "admin@readmoa.net"
                 userid = "user-id"
                 # TODO: Add 'author' field in the database and use this info.
-                author = record["author"]
+                _author = record["author"]
 
                 # Check if the post already exists.
                 post = conn.execute(

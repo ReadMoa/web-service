@@ -139,9 +139,10 @@ def read_feed_file(feed_filepath):
         content = f.readlines()
 
     for line in content:
-        if line[0] == '#':
+        line = line.strip()
+        if line == '' or line[0] == '#':
             continue
-        urls.append(line.strip())
+        urls.append(line)
 
     return urls
 
@@ -368,6 +369,7 @@ def add_content_to_database(parsed_content):
 def main():
     feed_path = os.path.join(os.path.dirname(__file__), RSS_FEED_FILE)
     for feed_url in read_feed_file(feed_path):
+        print("RSS processing started for ", feed_url)
         rss_content = fetch_rss(feed_url)
         parsed_content = read_rss(rss_content)
         for record in parsed_content:

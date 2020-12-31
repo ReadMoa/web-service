@@ -1,4 +1,33 @@
 # Comment
+
+# Dec. 30, 2020
+# 영화평곤가 홍수정(Brunch) - 영화, 문화 
+https://brunch.co.kr/rss/@@2W0d
+# 이동진(Brunch) - 영화
+https://brunch.co.kr/rss/@@2wTo
+# 스타일컨설턴트 최지혜(Brunch) - 스타일, 패션
+https://brunch.co.kr/rss/@@9he
+# 신상철(Brunch) - 에세이 
+https://brunch.co.kr/rss/@@cWc
+# 골드래빗의 브런치(Brunch) - 경제
+https://brunch.co.kr/rss/@@2XaY
+# 피트니스 큐레이터 김성운의 브런치(Brunch) - 운동, 피트니스
+https://brunch.co.kr/rss/@@Qgk
+# songoflucia(Brunch) - 영화, 마케팅
+https://brunch.co.kr/rss/@@18al
+# 달공원(Brunch) - 에세이
+https://brunch.co.kr/rss/@@TXl
+# 배지영(Brunch) - 문학 
+https://brunch.co.kr/rss/@@1aBN
+# 도서관에 사는 남자(Brunch) -  도서
+https://brunch.co.kr/rss/@@2Nv
+# 정욱(Brunch) - 여행 에세이
+https://brunch.co.kr/rss/@@nFb
+# 차칸양(Brunch) - 재무, 경제
+https://brunch.co.kr/rss/@@2ub
+# 꼬날의 좌충우돌 PR현장 이야기 (Brunch) - 마케팅
+https://brunch.co.kr/rss/@@2vd
+
 # Dec. 29, 2020
 # 호호동호 (Brunch)
 https://brunch.co.kr/rss/@@3UMB
@@ -6,5 +35,6 @@ https://brunch.co.kr/rss/@@3UMB
 # Dec. 28, 2020: 슬기 (Brunch)
 https://brunch.co.kr/rss/@@4Mgp
 http://rss.egloos.com/blog/hsong
-https://horangssam.tistory.com/rss
+# TODO: uncomment when the comment field can be extracted nicely (e.g. remove "728x90 반응형")
+#https://horangssam.tistory.com/rss
 https://awesome-blogs.petabytes.org/feeds?group=real_estate

@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import datetime
-import hashlib
 import logging
 import os
 
@@ -150,12 +149,12 @@ db = init_connection_engine()
 @app.before_first_request
 def create_tables():
     try:
-      import googleclouddebugger
-      googleclouddebugger.enable(
-        breakpoint_enable_canary=True
-      )
+        import googleclouddebugger
+        googleclouddebugger.enable(
+            breakpoint_enable_canary=True
+            )
     except ImportError:
-      pass
+        pass
 
     # Create tables (if they don't already exist)
     with db.connect() as conn:
@@ -188,7 +187,7 @@ def create_tables():
             ");"
         )
 
-        # Create comments if not exist. 
+        # Create comments if not exist.
         conn.execute(
             "CREATE TABLE IF NOT EXISTS comments ("
             "post_url TINYTEXT, "
@@ -262,8 +261,8 @@ def create_tables():
                 featured_comment_user_email="user@readmoa.net",
                 featured_comment_user_photo_url="/chrome_icon.png",
                 featured_comment_user_id="user-id")
-    except Exception as e:
-        logger.exception(e)
+    except db.Error as ex:
+        logger.exception(ex)
         return Response(
             status=500,
             response="Unable to successfully cast vote! Please check the "
@@ -359,13 +358,13 @@ def add_post():
     return render_template("add_post.html")
 
 # Returns a full URL from og:url.
-def getFullUrl(parentUrl, openGraphUrl):
-    openGraphUrl = openGraphUrl.strip()
-    if openGraphUrl.startswith('http'):
-        return openGraphUrl
-    elif openGraphUrl.startswith('/'):
-        p = urlparse(parentUrl)
-        return p.scheme + '://' + p.netloc + openGraphUrl
+def getFullUrl(parent_url, og_url):
+    og_url = og_url.strip()
+    if og_url.startswith('http'):
+        return og_url
+    elif og_url.startswith('/'):
+        p_url = urlparse(parent_url)
+        return p_url.scheme + '://' + p_url.netloc + og_url
     else:
         return ''
 
@@ -386,12 +385,12 @@ def add_post_submit():
             main_image = each_text.get('content')
         if each_text.get('property') == 'og:url':
             og_url = each_text.get('content')
-            fullUrl = getFullUrl(url, og_url)
-            if fullUrl:
-                url = fullUrl
-                logger.info('New URL from og:url: ' + url)
+            full_url = getFullUrl(url, og_url)
+            if full_url:
+                url = full_url
+                logger.info('New URL from og:url: %s', url)
             else:
-                logger.warning('Failed to generate a full URL from ' + og_url)
+                logger.warning('Failed to generate a full URL from %s', og_url)
                 return Response(
                     status=500,
                     response="INSERT operation failed.",
@@ -432,8 +431,8 @@ def add_post_submit():
                     time_cast=time_cast, userid=userid,
                     title=title, main_image=main_image,
                     description=description)
-    except Exception as e:
-        logger.exception(e)
+    except db.Error as ex:
+        logger.exception(ex)
         return Response(
             status=500,
             response="INSERT operation failed.",
@@ -498,7 +497,7 @@ def api_list_posts():
 @app.route('/api/add_post', methods=["POST"])
 def api_add_post():
     post = request.json
-    
+
     logger.warning('SEE HERE')
     logger.warning('add post=%s', request.get_json())
 
@@ -520,12 +519,12 @@ def api_add_post():
             main_image = each_text.get('content')
         if each_text.get('property') == 'og:url':
             og_url = each_text.get('content')
-            fullUrl = getFullUrl(url, og_url)
-            if fullUrl:
-                url = fullUrl
-                logger.info('New URL from og:url: ' + url)
+            full_url = getFullUrl(url, og_url)
+            if full_url:
+                url = full_url
+                logger.info('New URL from og:url: %s', url)
             else:
-                logger.warning('Failed to generate a full URL from ' + og_url)
+                logger.warning('Failed to generate a full URL from %s', og_url)
                 return Response(
                     status=500,
                     response="INSERT operation failed.",
@@ -564,8 +563,8 @@ def api_add_post():
                     time_cast=time_cast, userid=userid,
                     title=title, main_image=main_image,
                     description=description)
-    except Exception as e:
-        logger.exception(e)
+    except db.Error as ex:
+        logger.exception(ex)
         return Response(
             status=500,
             response="INSERT operation failed.",

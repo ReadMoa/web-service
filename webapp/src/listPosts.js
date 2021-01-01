@@ -1,5 +1,4 @@
 // @flow
-
 import React, { useEffect, useState } from "react";
 import "./listPosts.css";
 
@@ -11,6 +10,7 @@ import CardActionArea from "@material-ui/core/CardActionArea";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import CardMedia from "@material-ui/core/CardMedia";
+import InfiniteScroll from "react-infinite-scroll-component";
 import Typography from "@material-ui/core/Typography";
 
 import * as Constants from "./constants.js";
@@ -58,10 +58,11 @@ function ImgMediaCard(props) {
   );
 }
 
-function ListPosts() {
-  const [posts, setPosts] = useState([]);
+const ListPosts = () => {
+  const [posts, setPosts] = useState(Array.from({ length: 0 }));
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const style = useStyles();
 
   useEffect(() => {
     fetch(Constants.API_SERVER_PATH + "list_posts", {
@@ -70,7 +71,6 @@ function ListPosts() {
       .then((response) => response.json())
       .then(
         (response) => {
-          //console.log(response.posts);
           setPosts(response.posts);
           setIsLoaded(true);
         },
@@ -84,26 +84,55 @@ function ListPosts() {
       });
   }, []);
 
-  const items = [];
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  } else if (!isLoaded) {
-    return <div>Loading...</div>;
-  } else {
-    for (const [index, value] of posts.slice(0, 50).entries()) {
-      items.push(
-        <ImgMediaCard
-          key={index.toString()}
-          title={value.title}
-          description={value.description}
-          imageUrl={value.main_image_url}
-          postUrl={value.post_url}
-        />
-      );
-    }
+  const fetchMoreData = () => {
+    const url =
+      Constants.API_SERVER_PATH +
+      "list_posts?start=" +
+      posts.length +
+      "&count=10";
 
-    return <Box width="380px">{items}</Box>;
-  }
-}
+    fetch(url, {
+      method: "GET",
+    })
+      .then((response) => response.json())
+      .then(
+        (response) => {
+          console.log(response.posts);
+          setPosts((posts) => posts.concat(response.posts));
+          setIsLoaded(true);
+        },
+        (error) => {
+          setIsLoaded(true);
+          setError(error);
+        }
+      )
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  return (
+    <Box width="380px">
+      <InfiniteScroll
+        dataLength={posts.length}
+        next={fetchMoreData}
+        hasMore={true}
+        loader={<h4>Loading...</h4>}
+      >
+        {posts.map((post, index) => (
+          <div style={style} key={index.toString()}>
+            <ImgMediaCard
+              key={index.toString()}
+              title={post.title}
+              description={post.description}
+              imageUrl={post.main_image_url}
+              postUrl={post.post_url}
+            />
+          </div>
+        ))}
+      </InfiniteScroll>
+    </Box>
+  );
+};
 
 export default ListPosts;

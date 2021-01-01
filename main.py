@@ -30,6 +30,8 @@ from urllib.parse import urlparse
 from util import url as url_util
 
 OAUTH_CLIENT_ID = '460880639448-1t9uj6pc9hcr9dvfmvm7sqm03vv3k2th.apps.googleusercontent.com'
+# Max post index to return in /api/list_posts
+MAX_POSTS_TO_START = 1000
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -439,8 +441,30 @@ def add_post_submit():
 
     return redirect("/", code=301)
 
-@app.route('/api/list_posts')
+@app.route('/api/list_posts', methods=["GET"])
 def api_list_posts():
+    """Returns a list of recent posts.
+
+    Request params
+      start: the start index of recent posts (ordered by submission time).
+      count: number of posts to return.
+    """
+    # pylint: disable=fixme
+    # TODO: Can we change 'start' as an absolute position e.g. timestamp
+    #       to make the result consistent even when there is a new item
+    #       to posts_serving db.
+    start_idx = 0
+    if request.args.get("start") is not None:
+        start_idx = int(request.args.get("start"))
+        if start_idx < 0 or start_idx > MAX_POSTS_TO_START:
+            start_idx = 0
+
+    count = 10
+    if request.args.get("count") is not None:
+        count = int(request.args.get("count"))
+        if count < 0 or count > MAX_POSTS_TO_START:
+            count = 10
+
     posts = []
     with db.connect() as conn:
         # Execute the query and fetch all results
@@ -448,10 +472,13 @@ def api_list_posts():
             "SELECT post_url, title, submission_time, main_image_url, description, "
             "       user_display_name, user_email, user_photo_url, user_id, user_provider_id "
             "FROM posts_serving "
-            "ORDER BY submission_time DESC LIMIT 100"
+            "ORDER BY submission_time DESC LIMIT " + str(start_idx + count)
         ).fetchall()
         # Convert the results into a list of dicts representing votes
-        for row in recent_posts:
+        if len(recent_posts) < start_idx:
+            return jsonify(posts=[])
+
+        for row in recent_posts[start_idx:]:
             posts.append({
                 "post_url": row[0],
                 "title": row[1],

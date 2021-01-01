@@ -1,5 +1,35 @@
 # Comment
 
+# Jan. 1, 2021
+# 외쿡인노동자(Brunch) - 개발자 
+https://brunch.co.kr/rss/@@SIu
+# 한상훈(Brunch) - 개발자, 스타트업
+https://brunch.co.kr/rss/@@EMK
+# 기발자(Brunch) - 개발자
+https://brunch.co.kr/rss/@@6aS
+# 이승준(Brunch) - 개발자
+https://brunch.co.kr/rss/@@6M4k
+# 우노(Brunch) - 개발자
+https://brunch.co.kr/rss/@@1pkH
+# 양준철(Brunch) - 개발자, 스타트업
+https://brunch.co.kr/rss/@@lIP
+# 메튜장(Brunch) - 개발자
+https://brunch.co.kr/rss/@@GEd
+# TOMO(Brunch) - 개발자
+https://brunch.co.kr/rss/@@Rxq
+# 존과 지니(Brunch) - 개발자
+https://brunch.co.kr/rss/@@P0c
+# 고코더(Brunch) - 개발자
+https://brunch.co.kr/rss/@@9lr1
+# 개발하는 문돌이(Brunch) - 개발자
+https://brunch.co.kr/rss/@@ZJX
+# 책쓰는 프로그래머 유동(Brunch) - 개발자
+https://brunch.co.kr/rss/@@6dD
+# 신현묵(Brunch) - 개발자
+https://brunch.co.kr/rss/@@19F4
+# 마르코(Brunch) - 개발자 
+https://brunch.co.kr/rss/@@YZF
+
 # Dec. 31, 2020
 # 이동영 글쓰기(Brunch) - 인문교양
 https://brunch.co.kr/rss/@@iDz

@@ -443,7 +443,11 @@ def add_post_submit():
 
 @app.route('/api/list_posts', methods=["GET"])
 def api_list_posts():
-    """Returns list of recent posts.
+    """Returns a list of recent posts.
+
+    Request params
+      start: the start index of recent posts (ordered by submission time).
+      count: number of posts to return.
     """
     # pylint: disable=fixme
     # TODO: Can we change 'start' as an absolute position e.g. timestamp

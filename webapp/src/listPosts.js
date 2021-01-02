@@ -29,7 +29,7 @@ function ImgMediaCard(props) {
 
   return (
     <Card className={classes.box}>
-      <CardActionArea className={classes.root} href={props.postUrl}>
+      <CardActionArea className={classes.root} href={props.viewPageUrl}>
         <CardMedia
           component="img"
           alt={props.title}
@@ -50,7 +50,7 @@ function ImgMediaCard(props) {
         <Button size="small" color="primary">
           Learn More
         </Button>
-        <Button size="small" color="primary" href={props.postUrl}>
+        <Button size="small" color="primary" href={props.viewPageUrl}>
           Read
         </Button>
       </CardActions>
@@ -127,6 +127,8 @@ const ListPosts = () => {
               description={post.description}
               imageUrl={post.main_image_url}
               postUrl={post.post_url}
+              // Change "/p/" to "http://localhost:8080/p/" for development or test.
+              viewPageUrl={"/p/" + post.post_url_hash}
             />
           </div>
         ))}

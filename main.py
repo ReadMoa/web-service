@@ -325,6 +325,38 @@ def resource_favicon():
 def serve_image(path):
     return send_from_directory('static/images', path)
 
+# TODO: Move this (page view) logic to React from Flask template rendering.
+@app.route("/p/<path:path>", methods=["GET"])
+def view_page(path):
+    post = {}
+    with db.connect() as conn:
+        # Execute the query and fetch all results
+        returned_posts = conn.execute(
+            "SELECT post_url_hash, post_url, title, submission_time, main_image_url, description, "
+            "       user_display_name, user_email, user_photo_url, user_id, user_provider_id "
+            "FROM posts_serving "
+            "where post_url_hash = '" + path + "'"
+        ).fetchall()
+        # Convert the results into a list of dicts representing votes
+        if len(returned_posts) <= 0:
+            # 404
+            return Response(
+                status=404,
+                response="The post is not available.",
+            )
+
+        row = returned_posts[0]
+        post = {
+                "post_url_hash": row[0],
+                "post_url": row[1],
+                "title": row[2],
+                "submission_time": row[3],
+                "main_image_url": row[4],
+                "description": row[5]}
+
+    return render_template(
+        "view_post.html", post=post)
+
 @app.route('/tokensignin', methods=['POST'])
 def tokensignin():
     idtoken = request.form['idtoken']
@@ -468,7 +500,7 @@ def api_list_posts():
     with db.connect() as conn:
         # Execute the query and fetch all results
         recent_posts = conn.execute(
-            "SELECT post_url, title, submission_time, main_image_url, description, "
+            "SELECT post_url_hash, post_url, title, submission_time, main_image_url, description, "
             "       user_display_name, user_email, user_photo_url, user_id, user_provider_id "
             "FROM posts_serving "
             "ORDER BY submission_time DESC LIMIT " + str(start_idx + count)
@@ -479,11 +511,12 @@ def api_list_posts():
 
         for row in recent_posts[start_idx:]:
             posts.append({
-                "post_url": row[0],
-                "title": row[1],
-                "submission_time": row[2],
-                "main_image_url": row[3],
-                "description": row[4]})
+                "post_url_hash": row[0],
+                "post_url": row[1],
+                "title": row[2],
+                "submission_time": row[3],
+                "main_image_url": row[4],
+                "description": row[5]})
     return jsonify(posts=posts)
 
 # JSON data format for request.

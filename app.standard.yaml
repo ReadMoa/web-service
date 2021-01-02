@@ -54,6 +54,10 @@ handlers:
     script: auto
     secure: always
 
+  - url: /p/
+    script: auto
+    secure: always
+
   - url: /
     static_files: webapp/build/index.html
     upload: webapp/build/index.html

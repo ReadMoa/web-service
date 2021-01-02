@@ -8,13 +8,13 @@
 import hashlib
 
 def url_to_hashkey(url):
-    """Generate a 64 bit hash key from a URL string.
+    """Generate a 96 bit hash key from a URL string.
 
     Args:
       url: A URL string.
 
     Returns:
-      A 64 bit hash key.
+      A 96 bit hash key.
     """
-    return hashlib.sha512(url.encode()).hexdigest()[0:64]
+    return hashlib.sha512(url.encode()).hexdigest()[0:24]
     

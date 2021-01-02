@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>{{post.title}}</title>
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+
+    <meta name="description" content="{{post.description}}" />
+
+    <meta name="robots" content="max-image-preview:standard" />
+    <meta name="robots" content="max-video-preview:-1" />
+
+    <meta property="og:title" content="{{post.title}}" />
+    <meta property="og:description" content="{{post.description}}" />
+    <meta property="og:image" content="{{post.main_image_url}}" />
+    <style>
+      .iframe-container {
+        overflow: hidden;
+        /* 16:9 aspect ratio */
+        padding-top: 210%;
+        position: relative;
+      }
+
+      .iframe-container iframe {
+        border: 0;
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="iframe-container">
+      <iframe src="{{post.post_url}}"></iframe>
+    </div>
+  </body>
+</html>

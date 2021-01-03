@@ -18,13 +18,13 @@ runtime: python37
 # something like https://cloud.google.com/secret-manager/docs/overview to help keep
 # secrets secret.
 env_variables:
-    CLOUD_SQL_CONNECTION_NAME: {enter your SQL connection name}
-    DB_USER: {enter DB USER}
-    DB_PASS: {enter password}
-    DB_NAME: {enter DB NAME}
-    PRIVACY_ADMIN_NAME: {privacy admin name}
-    PRIVACY_ADMIN_EMAIL: {privacy admin email}
-    PRIVACY_ADMIN_PHONE: {privacy admin phone}
+  CLOUD_SQL_CONNECTION_NAME: { enter your SQL connection name }
+  DB_USER: { enter DB USER }
+  DB_PASS: { enter password }
+  DB_NAME: { enter DB NAME }
+  PRIVACY_ADMIN_NAME: { privacy admin name }
+  PRIVACY_ADMIN_EMAIL: { privacy admin email }
+  PRIVACY_ADMIN_PHONE: { privacy admin phone }
 
 handlers:
   - url: /static

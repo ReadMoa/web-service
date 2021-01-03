@@ -15,20 +15,17 @@
 import datetime
 import logging
 import os
+from urllib.parse import urlparse
 
 # For parsing a webpage.
 from bs4 import BeautifulSoup
-from flask import Flask, jsonify, render_template, request, redirect, Response, send_from_directory
+from flask import Flask, jsonify, render_template, request, Response, send_from_directory
 from flask_cors import CORS
-from google.oauth2 import id_token
-from google.auth.transport import requests as auth_requests
 # For crawling a webpage.
 import requests
 import sqlalchemy
-from urllib.parse import urlparse
 from util import url as url_util
 
-OAUTH_CLIENT_ID = '460880639448-1t9uj6pc9hcr9dvfmvm7sqm03vv3k2th.apps.googleusercontent.com'
 # Max post index to return in /api/list_posts
 MAX_POSTS_TO_START = 1000
 
@@ -140,11 +137,9 @@ def init_unix_connection_engine(db_config):
 
     return pool
 
-
 # The SQLAlchemy engine will help manage interactions, including automatically
 # managing a pool of connections to your database
 db = init_connection_engine()
-
 
 @app.before_first_request
 def create_tables():
@@ -166,6 +161,7 @@ def create_tables():
         # Create posts_serving if not exist.
         conn.execute(
             "CREATE TABLE IF NOT EXISTS posts_serving ("
+            # TODO: Shrink it to 24 characters.
             "post_url_hash CHAR(64) NOT NULL, "
             "post_url  TEXT(2084) NOT NULL, "
             "submission_time DATETIME, "
@@ -274,34 +270,6 @@ def google_service_init():
     # no-op
     return
 
-@app.route("/", methods=["GET"])
-def index():
-    posts = []
-    with db.connect() as conn:
-        # Execute the query and fetch all results
-        recent_posts = conn.execute(
-            "SELECT post_url, title, submission_time, main_image_url, description, "
-            "       user_display_name, user_email, user_photo_url, user_id, user_provider_id "
-            "FROM posts_serving "
-            "ORDER BY submission_time DESC LIMIT 10"
-        ).fetchall()
-        # Convert the results into a list of dicts representing votes
-        for row in recent_posts:
-            posts.append({
-                "post_url": row[0],
-                "title": row[1],
-                "submission_time": row[2],
-                "main_image_url": row[3],
-                "description": row[4]})
-
-    return render_template(
-        "list.html", recent_posts=posts, num_posts=len(posts))
-
-# Test with React.
-@app.route("/test/list", methods=["GET"])
-def test_list():
-    return render_template("test_list.html")
-
 @app.route("/privacy", methods=["GET"])
 def page_privacy():
     privacy_admin = {}
@@ -357,38 +325,6 @@ def view_page(path):
     return render_template(
         "view_post.html", post=post)
 
-@app.route('/tokensignin', methods=['POST'])
-def tokensignin():
-    idtoken = request.form['idtoken']
-    # (Receive token by HTTPS POST)
-    # ...
-
-    try:
-        # Specify the CLIENT_ID of the app that accesses the backend:
-        idinfo = id_token.verify_oauth2_token(
-                idtoken, auth_requests.Request(), OAUTH_CLIENT_ID)
-
-        # Or, if multiple clients access the backend server:
-        # idinfo = id_token.verify_oauth2_token(token, requests.Request())
-        # if idinfo['aud'] not in [CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]:
-        #     raise ValueError('Could not verify audience.')
-
-        # If auth request is from a G Suite domain:
-        # if idinfo['hd'] != GSUITE_DOMAIN_NAME:
-        #     raise ValueError('Wrong hosted domain.')
-
-        # ID token is valid. Get the user's Google Account ID from the decoded token.
-        userid = idinfo['sub']
-        logger.warning('user id=%s', userid)
-    except ValueError:
-        # Invalid token
-        pass
-    return idinfo
-
-@app.route("/add_post", methods=["GET"])
-def add_post():
-    return render_template("add_post.html")
-
 # Returns a full URL from og:url.
 def getFullUrl(parent_url, og_url):
     og_url = og_url.strip()
@@ -399,78 +335,6 @@ def getFullUrl(parent_url, og_url):
         return p_url.scheme + '://' + p_url.netloc + og_url
     else:
         return ''
-
-@app.route("/add_post", methods=["POST"])
-def add_post_submit():
-    url = request.form["url"]
-    title = ''
-    main_image = ''
-    description = ''
-
-    # Crawl and parse a webpage.
-    source_code = requests.get(url).text
-    soup = BeautifulSoup(source_code, 'html.parser')
-    for each_text in soup.findAll('meta'):
-        if each_text.get('property') == 'og:title':
-            title = each_text.get('content')
-        if each_text.get('property') == 'og:image':
-            main_image = each_text.get('content')
-        if each_text.get('property') == 'og:url':
-            og_url = each_text.get('content')
-            full_url = getFullUrl(url, og_url)
-            if full_url:
-                url = full_url
-                logger.info('New URL from og:url: %s', url)
-            else:
-                logger.warning('Failed to generate a full URL from %s', og_url)
-                return Response(
-                    status=500,
-                    response="INSERT operation failed.",
-                )
-        if each_text.get('property') == 'og:description':
-            description = each_text.get('content')
-
-    url_hash = url_util.url_to_hashkey(url)
-    _comment = request.form["comment"]
-    idtoken = request.form["idtoken"]
-    time_cast = datetime.datetime.utcnow()
-
-    userid = ''
-    try:
-        idinfo = id_token.verify_oauth2_token(
-                idtoken, auth_requests.Request(), OAUTH_CLIENT_ID)
-        userid = idinfo['sub']
-        logger.warning('user id=%s', userid)
-    except ValueError:
-        # Invalid token
-        pass
-
-    stmt = sqlalchemy.text(
-        "INSERT INTO posts_serving "
-        "  (post_url_hash, post_url, submission_time, user_id, "
-        "   title, main_image_url, description) "
-        " VALUES "
-        "  (:url_hash, :url, :time_cast, :userid, "
-        "   :title, :main_image, :description)"
-    )
-
-    logger.warning(stmt)
-
-    try:
-        with db.connect() as conn:
-            conn.execute(
-                    stmt, url_hash=url_hash, url=url,
-                    time_cast=time_cast, userid=userid,
-                    title=title, main_image=main_image,
-                    description=description)
-    except db.Error as ex:
-        logger.exception(ex)
-        return Response(
-            status=500,
-            response="INSERT operation failed.",
-        )
-
-    return redirect("/", code=301)
 
 @app.route('/api/list_posts', methods=["GET"])
 def api_list_posts():
@@ -569,14 +433,6 @@ def api_add_post():
     time_cast = datetime.datetime.utcnow()
 
     userid = ''
-    try:
-        idinfo = id_token.verify_oauth2_token(
-                idtoken, auth_requests.Request(), OAUTH_CLIENT_ID)
-        userid = idinfo['sub']
-        logger.warning('user id=%s', userid)
-    except ValueError:
-        # Invalid token
-        pass
 
     stmt = sqlalchemy.text(
         "INSERT INTO posts_serving "

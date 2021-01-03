@@ -16,6 +16,7 @@ logger = logging.getLogger()
 
 RSS_FEED_FILE = "feeds.txt"
 MAX_SUMMARY_LENGTH = 150
+DATABASE_MODE = "prod"
 
 # The SQLAlchemy engine will help manage interactions, including automatically
 # managing a pool of connections to your database
@@ -217,13 +218,14 @@ def add_content_to_database(parsed_content):
     Retruns:
       N/A
     """
-    stmt = sqlalchemy.text(
-        "INSERT INTO posts_serving "
-        "  (post_url_hash, post_url, submission_time, user_id, "
-        "   user_email, title, main_image_url, description) "
-        " VALUES "
-        "  (:url_hash, :url, :time_cast, :userid, "
-        "   :user_email, :title, :main_image, :description)"
+    stmt = sqlalchemy.text("""
+        INSERT INTO {mode}_posts_serving 
+          (post_url_hash, post_url, submission_time, user_id, 
+           user_email, title, main_image_url, description) 
+        VALUES 
+         (:url_hash, :url, :time_cast, :userid, 
+          :user_email, :title, :main_image, :description)
+        """.format(mode=DATABASE_MODE)
     )
 
     try:
@@ -241,10 +243,11 @@ def add_content_to_database(parsed_content):
                 _author = record["author"]
 
                 # Check if the post already exists.
-                post = conn.execute(
-                    "SELECT post_url_hash, post_url, submission_time "
-                    "FROM posts_serving "
-                    "WHERE post_url_hash = '" + record["key"] + "'"
+                post = conn.execute("""
+                    SELECT post_url_hash, post_url, submission_time 
+                    FROM {mode}_posts_serving 
+                    WHERE post_url_hash = '{key}'
+                    """.format(mode=DATABASE_MODE, key=record["key"] )
                 ).fetchall()
 
                 if (len(post) > 0):

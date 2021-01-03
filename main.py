@@ -30,6 +30,7 @@ from util import url as url_util
 
 # Max post index to return in /api/list_posts
 MAX_POSTS_TO_START = 1000
+DATABASE_MODE = "prod"
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -72,11 +73,12 @@ def view_page(path):
     post = {}
     with db.connect() as conn:
         # Execute the query and fetch all results
-        returned_posts = conn.execute(
-            "SELECT post_url_hash, post_url, title, submission_time, main_image_url, description, "
-            "       user_display_name, user_email, user_photo_url, user_id, user_provider_id "
-            "FROM posts_serving "
-            "where post_url_hash = '" + path + "'"
+        returned_posts = conn.execute("""
+            SELECT post_url_hash, post_url, title, submission_time, main_image_url, description, 
+                   user_display_name, user_email, user_photo_url, user_id, user_provider_id 
+            FROM {mode}_posts_serving 
+            where post_url_hash = '{key}'
+            """.format(mode=DATABASE_MODE, key=path)
         ).fetchall()
         # Convert the results into a list of dicts representing votes
         if len(returned_posts) <= 0:
@@ -136,11 +138,12 @@ def api_list_posts():
     posts = []
     with db.connect() as conn:
         # Execute the query and fetch all results
-        recent_posts = conn.execute(
-            "SELECT post_url_hash, post_url, title, submission_time, main_image_url, description, "
-            "       user_display_name, user_email, user_photo_url, user_id, user_provider_id "
-            "FROM posts_serving "
-            "ORDER BY submission_time DESC LIMIT " + str(start_idx + count)
+        recent_posts = conn.execute("""
+            SELECT post_url_hash, post_url, title, submission_time, main_image_url, description, 
+                   user_display_name, user_email, user_photo_url, user_id, user_provider_id 
+            FROM {mode}_posts_serving 
+            ORDER BY submission_time DESC LIMIT {limit:d}
+            """.format(mode=DATABASE_MODE, limit=start_idx + count)
         ).fetchall()
         # Convert the results into a list of dicts representing votes
         if len(recent_posts) < start_idx:
@@ -173,7 +176,6 @@ def api_add_post():
 
     url = post["url"]
     _comment = post["comment"]
-    idtoken = post["idtoken"]
 
     title = ''
     main_image = ''
@@ -207,13 +209,14 @@ def api_add_post():
 
     userid = ''
 
-    stmt = sqlalchemy.text(
-        "INSERT INTO posts_serving "
-        "  (post_url_hash, post_url, submission_time, user_id, "
-        "   title, main_image_url, description) "
-        " VALUES "
-        "  (:url_hash, :url, :time_cast, :userid, "
-        "   :title, :main_image, :description)"
+    stmt = sqlalchemy.text("""
+        INSERT INTO {mode}_posts_serving 
+          (post_url_hash, post_url, submission_time, user_id, 
+           title, main_image_url, description) 
+         VALUES 
+          (:url_hash, :url, :time_cast, :userid, 
+           :title, :main_image, :description)
+        """.format(mode=DATABASE_MODE)
     )
 
     logger.warning(stmt)

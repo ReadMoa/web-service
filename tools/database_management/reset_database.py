@@ -173,7 +173,7 @@ def drop_tables(db_instance, mode, dryrun):
             print("SQL query to execute: \n%s" % stmt)
         else:
             print("Executing the following command: \n%s" % stmt)
-        # conn.execute(stmt)
+            conn.execute(stmt)
 
         stmt = sqlalchemy.text(
                 "DROP TABLE {mode}_comments;".format(mode=mode))
@@ -181,7 +181,7 @@ def drop_tables(db_instance, mode, dryrun):
             print("SQL query to execute: \n%s" % stmt)
         else:
             print("Executing the following command: \n%s" % stmt)
-            #conn.execute(stmt)
+            conn.execute(stmt)
 
         stmt = sqlalchemy.text(
                 "DROP TABLE {mode}_users;".format(mode=mode))
@@ -189,7 +189,7 @@ def drop_tables(db_instance, mode, dryrun):
             print("SQL query to execute: \n%s" % stmt)
         else:
             print("Executing the following command: \n%s" % stmt)
-            #conn.execute(stmt)
+            conn.execute(stmt)
 
 def main(argv):
     """Main entry point.

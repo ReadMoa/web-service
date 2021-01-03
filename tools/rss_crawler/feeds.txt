@@ -114,7 +114,7 @@ https://brunch.co.kr/rss/@@3UMB
 
 # Dec. 28, 2020: 슬기 (Brunch)
 https://brunch.co.kr/rss/@@4Mgp
-http://rss.egloos.com/blog/hsong
 # TODO: uncomment when the comment field can be extracted nicely (e.g. remove "728x90 반응형")
+#http://rss.egloos.com/blog/hsong
 #https://horangssam.tistory.com/rss
-https://awesome-blogs.petabytes.org/feeds?group=real_estate
+#https://awesome-blogs.petabytes.org/feeds?group=real_estate

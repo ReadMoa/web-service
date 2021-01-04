@@ -1,21 +1,11 @@
-# Copyright 2018 Google LLC
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+"""ReadMoa web API server.
 
+Provide handlers for APIs, static images/HTMLs.
+"""
 import datetime
 import logging
 import os
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 
 # For parsing a webpage.
 from bs4 import BeautifulSoup
@@ -41,11 +31,18 @@ db = database.init_connection_engine()
 
 @app.before_first_request
 def google_service_init():
+    """A function to be run before the first request to this instance of the application.
+    """
     # no-op
     return
 
 @app.route("/privacy", methods=["GET"])
 def page_privacy():
+    """Returns privacy document.
+
+    Returns:
+      privacy.html.
+    """
     privacy_admin = {}
     privacy_admin["name"] = os.environ["PRIVACY_ADMIN_NAME"]
     privacy_admin["email"] = os.environ["PRIVACY_ADMIN_EMAIL"]
@@ -55,21 +52,46 @@ def page_privacy():
 
 @app.route("/terms", methods=["GET"])
 def page_terms():
+    """Returns terms document.
+
+    Returns:
+      terms.html.
+    """
     return render_template("terms.html")
 
 # TODO: Use a more efficient way to serve static files e.g. nginx.
 @app.route("/favicon.ico", methods=["GET"])
 def resource_favicon():
+    """Returns the favicon file.
+
+    Returns:
+      favicon.ico.
+    """
     return send_from_directory("static", "favicon.ico")
 
 # TODO: Use a more efficient way to serve static files e.g. nginx.
 @app.route('/images/<path:path>')
 def serve_image(path):
+    """Returns a image file.
+
+    Args:
+      path: A path to image file.
+
+    Returns:
+      An image file from /static/images directory.
+    """
     return send_from_directory('static/images', path)
 
 # TODO: Move this (page view) logic to React from Flask template rendering.
 @app.route("/p/<path:path>", methods=["GET"])
 def view_page(path):
+    """Renders a view_post page (/p/)
+
+    Renders a view_post.html from a post with the input post key.
+
+    Args:
+      path: 96bit (24 hexadecimal digits) post key.
+    """
     post = {}
     with db.connect() as conn:
         # Execute the query and fetch all results
@@ -101,15 +123,26 @@ def view_page(path):
         "view_post.html", post=post)
 
 # Returns a full URL from og:url.
-def getFullUrl(parent_url, og_url):
-    og_url = og_url.strip()
-    if og_url.startswith('http'):
-        return og_url
-    elif og_url.startswith('/'):
+def get_full_url(parent_url, og_url):
+    """Generates a full URL from a relative URL.
+
+    Args:
+      parent_url: The parent document's URL (assume it's a full URL).
+      or_url: A URL extracted from OpenGraph metadata.
+
+    Returns:
+      A full URL string.
+    """
+    full_url = og_url.strip()
+    if full_url.startswith("/"):
         p_url = urlparse(parent_url)
-        return p_url.scheme + '://' + p_url.netloc + og_url
-    else:
-        return ''
+        full_url = "{scheme}://{host}{rest}".format(
+            scheme=p_url.scheme, host=p_url.netloc, rest=full_url)
+    elif not full_url.startswith("http"):
+        # A relative URL not under the root('/') directory.
+        full_url = urljoin(parent_url, full_url)
+
+    return full_url
 
 @app.route('/api/list_posts', methods=["GET"])
 def api_list_posts():
@@ -169,6 +202,14 @@ def api_list_posts():
 # TODO: Didn't test this function.
 @app.route('/api/add_post', methods=["POST"])
 def api_add_post():
+    """Flask handler for /api/add_post request.
+
+    Args:
+      N/A
+
+    Returns:
+      Echos the input JSON object.
+    """
     post = request.json
 
     logger.warning('SEE HERE')
@@ -191,7 +232,7 @@ def api_add_post():
             main_image = each_text.get('content')
         if each_text.get('property') == 'og:url':
             og_url = each_text.get('content')
-            full_url = getFullUrl(url, og_url)
+            full_url = get_full_url(url, og_url)
             if full_url:
                 url = full_url
                 logger.info('New URL from og:url: %s', url)

@@ -1,10 +1,18 @@
+"""RSS Crawling tool.
+
+Fetches RSS feeds listed in feeds.txt and insert new entries from the feeds
+to the post table.
+
+  Typical usage example:
+  $ PYTHONPATH=./ python3 tools/rss_crawler/main.py
+"""
 import datetime
 import logging
 import os
-import requests
-import sqlalchemy
 import time
 
+import requests
+import sqlalchemy
 from bs4 import BeautifulSoup
 from util import database
 from util import url as url_util
@@ -20,7 +28,7 @@ DATABASE_MODE = "prod"
 
 # The SQLAlchemy engine will help manage interactions, including automatically
 # managing a pool of connections to your database
-db = database.init_connection_engine()
+db_instance = database.init_connection_engine()
 
 def read_feed_file(feed_filepath):
     """Parses a feed list file and returns a list of feed URLs.
@@ -33,8 +41,8 @@ def read_feed_file(feed_filepath):
     """
     urls = []
 
-    with open(feed_filepath) as f:
-        content = f.readlines()
+    with open(feed_filepath) as feed_file:
+        content = feed_file.readlines()
 
     for line in content:
         line = line.strip()
@@ -54,7 +62,7 @@ def fetch_rss(url):
       The content of RSS document.
     """
     rss_doc = requests.get(url)
-    
+
     if rss_doc.status_code != 200:
         logger.warning(
                 "Failed to fetch with Response Code %d for %s",
@@ -78,7 +86,7 @@ def read_rss(rss_content):
       ]
     """
     soup = BeautifulSoup(rss_content, "xml")
-    
+
     content_list = []
     num_entries = 0
     if soup.rss:
@@ -95,7 +103,7 @@ def read_rss(rss_content):
             if (url.startswith("https://blog.naver.com")
                 or url.startswith("http://blog.naver.com")):
                 continue
-            
+
             updated = ''
             if not i.pubDate:
                 updated = i.pubdate.text
@@ -129,7 +137,7 @@ def read_rss(rss_content):
             if (url.startswith("https://blog.naver.com")
                 or url.startswith("http://blog.naver.com")):
                 continue
-            
+
             num_entries += 1
             content_list.append({
                 "key": url_util.url_to_hashkey(url),
@@ -144,7 +152,7 @@ def read_rss(rss_content):
             # TODO: Remove this limit when the test is done.
             if num_entries > 3:
                 break
-    
+
     logger.info("Number of entries: %d", len(content_list))
     return content_list
 
@@ -160,10 +168,9 @@ def extract_from_summary(rss_summary_text):
       An extracted string from the RSS summary record.
     """
     summary_soup = BeautifulSoup(rss_summary_text, "html.parser")
-    text = summary_soup.find_all(text=True)
     summary = ""
-    for t in text:
-        summary += "{} ".format(t)
+    for text in summary_soup.find_all(text=True):
+        summary += "{} ".format(text)
         if len(summary) > MAX_SUMMARY_LENGTH:
             break
 
@@ -229,7 +236,7 @@ def add_content_to_database(parsed_content):
     )
 
     try:
-        with db.connect() as conn:
+        with db_instance.connect() as conn:
             for record in parsed_content:
                 url_hash = record["key"]
                 url = record["link"]
@@ -250,12 +257,12 @@ def add_content_to_database(parsed_content):
                     """.format(mode=DATABASE_MODE, key=record["key"] )
                 ).fetchall()
 
-                if (len(post) > 0):
+                if len(post) > 0:
                     post_url = post[0][1]
                     logging.info("Already exists in posts_serving: %s",
                             post_url)
                     continue
-            
+
                 conn.execute(
                         stmt, url_hash=url_hash, url=url,
                         time_cast=time_cast, userid=userid,
@@ -263,22 +270,31 @@ def add_content_to_database(parsed_content):
                         title=title, main_image=main_image,
                         description=description)
                 logger.info("Record to DB: '%s'", title)
-    except Exception as e:
-        logger.exception(e)
+    except db_instance.Error as ex:
+        logger.exception(ex)
 
 def main():
+    """Main entry point.
+
+    Reads and parses RSS feeds. Insert new entries into the post database.
+
+    Args:
+        N/A
+    """
     feed_path = os.path.join(os.path.dirname(__file__), RSS_FEED_FILE)
     for feed_url in read_feed_file(feed_path):
         print("RSS processing started for ", feed_url)
         rss_content = fetch_rss(feed_url)
         parsed_content = read_rss(rss_content)
         for record in parsed_content:
-            logger.info("Incoming link: Key - %s, Main image - %s", record["key"], record["main_image"])
+            logger.info(
+                "Incoming link: Key - %s, Main image - %s",
+                record["key"], record["main_image"])
         add_content_to_database(parsed_content)
 
         print("RSS processing completed for ", feed_url)
     print("The full RSS import completed.")
-    
+
 
 if __name__ == "__main__":
     main()

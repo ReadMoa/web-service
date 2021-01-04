@@ -10,12 +10,12 @@ Drop tables and recreate them. Add a record to each table.
       conn.execute(stmt)
   except db.Error as ex:
       print("Error: %s" % ex)
-
 """
 import os
 
 import sqlalchemy
 
+# pylint: disable=missing-function-docstring
 # The SQLAlchemy engine will help manage interactions, including automatically
 # managing a pool of connections to your database
 def init_connection_engine():
@@ -97,6 +97,7 @@ def init_unix_connection_engine(db_config):
     cloud_sql_connection_name = os.environ["CLOUD_SQL_CONNECTION_NAME"]
 
     pool = sqlalchemy.create_engine(
+        # pylint: disable=line-too-long
         # Equivalent URL:
         # mysql+pymysql://<db_user>:<db_pass>@/<db_name>?unix_socket=<socket_path>/<cloud_sql_instance_name>
         sqlalchemy.engine.url.URL(
@@ -107,7 +108,8 @@ def init_unix_connection_engine(db_config):
             query={
                 "unix_socket": "{}/{}".format(
                     db_socket_dir,  # e.g. "/cloudsql"
-                    cloud_sql_connection_name)  # i.e "<PROJECT-NAME>:<INSTANCE-REGION>:<INSTANCE-NAME>"
+                    # i.e "<PROJECT-NAME>:<INSTANCE-REGION>:<INSTANCE-NAME>"
+                    cloud_sql_connection_name)
             }
         ),
         # ... Specify additional properties here.

@@ -1,48 +1,43 @@
 # Comment
 
-# Jan. 3, 2021
-# 꿘녜(Brunch) - 웹툰
-https://brunch.co.kr/rss/@@1aBA
-# peter(Brunch) - 웹툰
-https://brunch.co.kr/rss/@@1O57
-# Hae(Brunch) - 웹툰
-https://brunch.co.kr/rss/@@1ZsQ
-# 고고핑크(Brunch) - 웹툰
-https://brunch.co.kr/rss/@@160r
-# 정은영(Brunch) - 웹툰
-https://brunch.co.kr/rss/@@1aAL
-# Matthew Min 민연기(Brunch) - 웹툰
-https://brunch.co.kr/rss/@@1W2O
+# Dec. 28, 2020: 슬기 (Brunch)
+https://brunch.co.kr/rss/@@4Mgp
+# TODO: uncomment when the comment field can be extracted nicely (e.g. remove "728x90 반응형")
+#http://rss.egloos.com/blog/hsong
+#https://horangssam.tistory.com/rss
+#https://awesome-blogs.petabytes.org/feeds?group=real_estate
 
-# Jan. 1, 2021
-# 외쿡인노동자(Brunch) - 개발자 
-https://brunch.co.kr/rss/@@SIu
-# 한상훈(Brunch) - 개발자, 스타트업
-https://brunch.co.kr/rss/@@EMK
-# 기발자(Brunch) - 개발자
-https://brunch.co.kr/rss/@@6aS
-# 이승준(Brunch) - 개발자
-https://brunch.co.kr/rss/@@6M4k
-# 우노(Brunch) - 개발자
-https://brunch.co.kr/rss/@@1pkH
-# 양준철(Brunch) - 개발자, 스타트업
-https://brunch.co.kr/rss/@@lIP
-# 메튜장(Brunch) - 개발자
-https://brunch.co.kr/rss/@@GEd
-# TOMO(Brunch) - 개발자
-https://brunch.co.kr/rss/@@Rxq
-# 존과 지니(Brunch) - 개발자
-https://brunch.co.kr/rss/@@P0c
-# 고코더(Brunch) - 개발자
-https://brunch.co.kr/rss/@@9lr1
-# 개발하는 문돌이(Brunch) - 개발자
-https://brunch.co.kr/rss/@@ZJX
-# 책쓰는 프로그래머 유동(Brunch) - 개발자
-https://brunch.co.kr/rss/@@6dD
-# 신현묵(Brunch) - 개발자
-https://brunch.co.kr/rss/@@19F4
-# 마르코(Brunch) - 개발자 
-https://brunch.co.kr/rss/@@YZF
+# Dec. 29, 2020
+# 호호동호 (Brunch)
+https://brunch.co.kr/rss/@@3UMB
+
+# Dec. 30, 2020
+# 영화평곤가 홍수정(Brunch) - 영화, 문화 
+https://brunch.co.kr/rss/@@2W0d
+# 이동진(Brunch) - 영화
+https://brunch.co.kr/rss/@@2wTo
+# 스타일컨설턴트 최지혜(Brunch) - 스타일, 패션
+https://brunch.co.kr/rss/@@9he
+# 신상철(Brunch) - 에세이 
+https://brunch.co.kr/rss/@@cWc
+# 골드래빗의 브런치(Brunch) - 경제
+https://brunch.co.kr/rss/@@2XaY
+# 피트니스 큐레이터 김성운의 브런치(Brunch) - 운동, 피트니스
+https://brunch.co.kr/rss/@@Qgk
+# songoflucia(Brunch) - 영화, 마케팅
+https://brunch.co.kr/rss/@@18al
+# 달공원(Brunch) - 에세이
+https://brunch.co.kr/rss/@@TXl
+# 배지영(Brunch) - 문학 
+https://brunch.co.kr/rss/@@1aBN
+# 도서관에 사는 남자(Brunch) -  도서
+https://brunch.co.kr/rss/@@2Nv
+# 정욱(Brunch) - 여행 에세이
+https://brunch.co.kr/rss/@@nFb
+# 차칸양(Brunch) - 재무, 경제
+https://brunch.co.kr/rss/@@2ub
+# 꼬날의 좌충우돌 PR현장 이야기 (Brunch) - 마케팅
+https://brunch.co.kr/rss/@@2vd
 
 # Dec. 31, 2020
 # 이동영 글쓰기(Brunch) - 인문교양
@@ -94,41 +89,110 @@ https://brunch.co.kr/rss/@@5jP
 # 생각중독자 이승(Brunch) - 인문교양, 영화
 https://brunch.co.kr/rss/@@1FmP
 
-# Dec. 30, 2020
-# 영화평곤가 홍수정(Brunch) - 영화, 문화 
-https://brunch.co.kr/rss/@@2W0d
-# 이동진(Brunch) - 영화
-https://brunch.co.kr/rss/@@2wTo
-# 스타일컨설턴트 최지혜(Brunch) - 스타일, 패션
-https://brunch.co.kr/rss/@@9he
-# 신상철(Brunch) - 에세이 
-https://brunch.co.kr/rss/@@cWc
-# 골드래빗의 브런치(Brunch) - 경제
-https://brunch.co.kr/rss/@@2XaY
-# 피트니스 큐레이터 김성운의 브런치(Brunch) - 운동, 피트니스
-https://brunch.co.kr/rss/@@Qgk
-# songoflucia(Brunch) - 영화, 마케팅
-https://brunch.co.kr/rss/@@18al
-# 달공원(Brunch) - 에세이
-https://brunch.co.kr/rss/@@TXl
-# 배지영(Brunch) - 문학 
-https://brunch.co.kr/rss/@@1aBN
-# 도서관에 사는 남자(Brunch) -  도서
+# Jan. 1, 2021
+# 외쿡인노동자(Brunch) - 개발자 
+https://brunch.co.kr/rss/@@SIu
+# 한상훈(Brunch) - 개발자, 스타트업
+https://brunch.co.kr/rss/@@EMK
+# 기발자(Brunch) - 개발자
+https://brunch.co.kr/rss/@@6aS
+# 이승준(Brunch) - 개발자
+https://brunch.co.kr/rss/@@6M4k
+# 우노(Brunch) - 개발자
+https://brunch.co.kr/rss/@@1pkH
+# 양준철(Brunch) - 개발자, 스타트업
+https://brunch.co.kr/rss/@@lIP
+# 메튜장(Brunch) - 개발자
+https://brunch.co.kr/rss/@@GEd
+# TOMO(Brunch) - 개발자
+https://brunch.co.kr/rss/@@Rxq
+# 존과 지니(Brunch) - 개발자
+https://brunch.co.kr/rss/@@P0c
+# 고코더(Brunch) - 개발자
+https://brunch.co.kr/rss/@@9lr1
+# 개발하는 문돌이(Brunch) - 개발자
+https://brunch.co.kr/rss/@@ZJX
+# 책쓰는 프로그래머 유동(Brunch) - 개발자
+https://brunch.co.kr/rss/@@6dD
+# 신현묵(Brunch) - 개발자
+https://brunch.co.kr/rss/@@19F4
+# 마르코(Brunch) - 개발자 
+https://brunch.co.kr/rss/@@YZF
+
+# Jan. 3, 2021
+# 꿘녜(Brunch) - 웹툰
+https://brunch.co.kr/rss/@@1aBA
+# peter(Brunch) - 웹툰
+https://brunch.co.kr/rss/@@1O57
+# Hae(Brunch) - 웹툰
+https://brunch.co.kr/rss/@@1ZsQ
+# 고고핑크(Brunch) - 웹툰
+https://brunch.co.kr/rss/@@160r
+# 정은영(Brunch) - 웹툰
+https://brunch.co.kr/rss/@@1aAL
+# Matthew Min 민연기(Brunch) - 웹툰
+https://brunch.co.kr/rss/@@1W2O
+
+# Jan. 4, 2021
+# 나는 누군가(Brunch) - 책
+https://brunch.co.kr/rss/@@3kT
+# 더굿북(Brunch) - 책
+https://brunch.co.kr/rss/@@TRE
+# 최다함 문화소믈리에(Brunch) - 책
+https://brunch.co.kr/rss/@@1lcG
+# 이용한 (Brunch) - 책
+https://brunch.co.kr/rss/@@1Sma
+# 인터파크 북DB(Brunch) - 책
+https://brunch.co.kr/rss/@@ocv
+# 해헌 서재(Brunch) - 책
+https://brunch.co.kr/rss/@@2h9I
+# 일상예술가 정해인(Brunch) - 책
+https://brunch.co.kr/rss/@@ABQ
+# 책방아저씨(Brunch) - 책
+https://brunch.co.kr/rss/@@3VJ
+# SOON 크리에이터(Brunch) - 책
+https://brunch.co.kr/rss/@@13f9
+# 단어벌레(Brunch) - 책
+https://brunch.co.kr/rss/@@aDJ
+# Peter Kim(Brunch) - 책
+https://brunch.co.kr/rss/@@mlX
+# 손화신(Brunch) - 책
+https://brunch.co.kr/rss/@@kFj
+# 삼봄(Brunch) - 책
+https://brunch.co.kr/rss/@@AGT
+# 마음달 안정현(Brunch) - 책
+https://brunch.co.kr/rss/@@lR2
+# 그럼에도 불구하고(Brunch) - 책
+https://brunch.co.kr/rss/@@yfq
+# 한재우(Brunch) - 책
+https://brunch.co.kr/rss/@@bAz
+# 깐 KKan(Brunch) - 책
+https://brunch.co.kr/rss/@@cBh
+# 하부건(Brunch) - 책
+https://brunch.co.kr/rss/@@EtL
+# 보름(Brunch) - 책
+https://brunch.co.kr/rss/@@aAK
+# 박민진(Brunch) - 책
+https://brunch.co.kr/rss/@@1Qwr
+# 생각창고(Brunch) - 책
+https://brunch.co.kr/rss/@@3la
+# 도서관에 사는 남자(Brunch) - 책
 https://brunch.co.kr/rss/@@2Nv
-# 정욱(Brunch) - 여행 에세이
-https://brunch.co.kr/rss/@@nFb
-# 차칸양(Brunch) - 재무, 경제
-https://brunch.co.kr/rss/@@2ub
-# 꼬날의 좌충우돌 PR현장 이야기 (Brunch) - 마케팅
-https://brunch.co.kr/rss/@@2vd
-
-# Dec. 29, 2020
-# 호호동호 (Brunch)
-https://brunch.co.kr/rss/@@3UMB
-
-# Dec. 28, 2020: 슬기 (Brunch)
-https://brunch.co.kr/rss/@@4Mgp
-# TODO: uncomment when the comment field can be extracted nicely (e.g. remove "728x90 반응형")
-#http://rss.egloos.com/blog/hsong
-#https://horangssam.tistory.com/rss
-#https://awesome-blogs.petabytes.org/feeds?group=real_estate
+# 지식생태학자 유영만(Brunch) - 책
+https://brunch.co.kr/rss/@@4ugA
+# 서용마(Brunch) - 책
+https://brunch.co.kr/rss/@@RF6
+# 박찬용(Brunch) - 책
+https://brunch.co.kr/rss/@@2xW
+# 불이(Brunch) - 책
+https://brunch.co.kr/rss/@@16Sg
+# 최동민(Brunch) - 책
+https://brunch.co.kr/rss/@@cJt
+# 서메리(Brunch) - 책
+https://brunch.co.kr/rss/@@4YAk
+# 정희(Brunch) - 책
+https://brunch.co.kr/rss/@@334
+# 윤영돈 코치(Brunch) - 책
+https://brunch.co.kr/rss/@@15pS
+# OIAA 오아(Brunch) - 책
+https://brunch.co.kr/rss/@@1NpW

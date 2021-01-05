@@ -2,14 +2,15 @@
 
 Provide handlers for APIs, static images/HTMLs.
 """
-import datetime
+from datetime import datetime
 import logging
 import os
 from urllib.parse import urlparse, urljoin
 
 # For parsing a webpage.
 from bs4 import BeautifulSoup
-from flask import Flask, jsonify, render_template, request, Response, send_from_directory
+# pylint: disable=line-too-long
+from flask import Flask, jsonify, make_response, render_template, request, Response, send_from_directory
 from flask_cors import CORS
 
 # For crawling a webpage.
@@ -278,6 +279,48 @@ def api_add_post():
 
     return jsonify(post=post)
 
+@app.route('/sitemap.xml')
+def sitemap_xml():
+    """Returns sitemap.xml data.
+
+    The sitemap is in a format below:
+    <?xml version="1.0" encoding="UTF-8"?>
+    <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+        <url>
+            <loc>http://www.example.com/foo.html</loc>
+            <lastmod>2018-06-04</lastmod>
+        </url>
+    </urlset>
+
+    Request params:
+      N/A
+
+    Returns:
+      sitemap.xml data.
+    """
+    posts = []
+    with db.connect() as conn:
+        # Execute the query and fetch all results
+        recent_posts = conn.execute("""
+            SELECT post_url_hash, post_url, title, submission_time, main_image_url
+            FROM {mode}_posts_serving 
+            ORDER BY submission_time DESC LIMIT {limit:d}
+            """.format(mode=DATABASE_MODE, limit=1000)
+        ).fetchall()
+
+        for row in recent_posts:
+            posts.append({
+                "post_url_hash": row[0],
+                "post_url": row[1],
+                "title": row[2],
+                "submission_date": row[3].date(),
+                "main_image_url": row[4]}
+                )
+
+    template = render_template('sitemap.xml', posts=posts)
+    response = make_response(template)
+    response.headers['Content-Type'] = 'application/xml'
+    return response
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8080, debug=True)

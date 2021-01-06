@@ -12,10 +12,10 @@ import os
 import time
 
 import requests
-import sqlalchemy
 from bs4 import BeautifulSoup
-from util import database
 from util import url as url_util
+from util.post import Post
+from util.post_db import PostDB
 
 # Uncomment to output logging messages.
 #import sys
@@ -27,9 +27,7 @@ MAX_SUMMARY_LENGTH = 150
 DATABASE_MODE = "prod"
 MAX_NUM_RECORDS_TO_READ_PER_FEED = 1
 
-# The SQLAlchemy engine will help manage interactions, including automatically
-# managing a pool of connections to your database
-db_instance = database.init_connection_engine()
+post_db = PostDB(DATABASE_MODE)
 
 def read_feed_file(feed_filepath):
     """Parses a feed list file and returns a list of feed URLs.
@@ -115,9 +113,13 @@ def read_rss(rss_content):
             if not i.author:
                 author = i.find("dc:creator").get_text()
 
+            key = url_util.url_to_hashkey(url)
+            if post_db.lookup(key):
+                continue
+
             num_entries += 1
             content_list.append({
-                "key": url_util.url_to_hashkey(url),
+                "key": key,
                 "title": i.title.text,
                 "updated": updated,
                 "link": url,
@@ -138,9 +140,13 @@ def read_rss(rss_content):
                 or url.startswith("http://blog.naver.com")):
                 continue
 
+            key = url_util.url_to_hashkey(url)
+            if post_db.lookup(key):
+                continue
+
             num_entries += 1
             content_list.append({
-                "key": url_util.url_to_hashkey(url),
+                "key": key,
                 "title": i.find("title").get_text(),
                 "updated": i.find("updated").get_text(),
                 "link": url,
@@ -225,53 +231,12 @@ def add_content_to_database(parsed_content):
     Retruns:
       N/A
     """
-    stmt = sqlalchemy.text("""
-        INSERT INTO {mode}_posts_serving 
-          (post_url_hash, post_url, submission_time, user_id, 
-           user_email, title, main_image_url, description) 
-        VALUES 
-         (:url_hash, :url, :time_cast, :userid, 
-          :user_email, :title, :main_image, :description)
-        """.format(mode=DATABASE_MODE)
-    )
-
-    try:
-        with db_instance.connect() as conn:
-            for record in parsed_content:
-                url_hash = record["key"]
-                url = record["link"]
-                title = record["title"]
-                description = extract_from_summary(record["summary"])
-                main_image = record["main_image"]
-                time_cast = datetime.datetime.utcnow()
-                user_email = "admin@readmoa.net"
-                userid = "user-id"
-                # TODO: Add 'author' field in the database and use this info.
-                _author = record["author"]
-
-                # Check if the post already exists.
-                post = conn.execute("""
-                    SELECT post_url_hash, post_url, submission_time 
-                    FROM {mode}_posts_serving 
-                    WHERE post_url_hash = '{key}'
-                    """.format(mode=DATABASE_MODE, key=record["key"] )
-                ).fetchall()
-
-                if len(post) > 0:
-                    post_url = post[0][1]
-                    logging.info("Already exists in posts_serving: %s",
-                            post_url)
-                    continue
-
-                conn.execute(
-                        stmt, url_hash=url_hash, url=url,
-                        time_cast=time_cast, userid=userid,
-                        user_email=user_email,
-                        title=title, main_image=main_image,
-                        description=description)
-                logger.info("Record to DB: '%s'", title)
-    except db_instance.Error as ex:
-        logger.exception(ex)
+    for record in parsed_content:
+        post = Post(post_url=record["link"],
+                title=record["title"],
+                main_image_url=record["main_image"],
+                description=extract_from_summary(record["summary"]))
+        post_db.insert(post)
 
 def main():
     """Main entry point.

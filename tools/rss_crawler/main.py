@@ -25,6 +25,7 @@ logger = logging.getLogger()
 RSS_FEED_FILE = "feeds.txt"
 MAX_SUMMARY_LENGTH = 150
 DATABASE_MODE = "prod"
+MAX_NUM_RECORDS_TO_READ_PER_FEED = 1
 
 # The SQLAlchemy engine will help manage interactions, including automatically
 # managing a pool of connections to your database
@@ -125,8 +126,7 @@ def read_rss(rss_content):
                 "main_image": fetch_main_image_link(url),
                 })
 
-            # TODO: Remove this limit when the test is done.
-            if num_entries > 3:
+            if num_entries > MAX_NUM_RECORDS_TO_READ_PER_FEED:
                 break
 
     elif soup.feed:

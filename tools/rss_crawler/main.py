@@ -150,7 +150,7 @@ def read_rss(rss_content):
                 })
 
             # TODO: Remove this limit when the test is done.
-            if num_entries > 3:
+            if num_entries > MAX_NUM_RECORDS_TO_READ_PER_FEED:
                 break
 
     logger.info("Number of entries: %d", len(content_list))

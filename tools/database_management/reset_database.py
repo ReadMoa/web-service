@@ -24,7 +24,7 @@ def create_tables(db_instance, mode, dryrun):
 
     Args:
         db_instance: a database instance.
-        mode: prod/dev mode.
+        mode: prod/dev/test mode.
         dryrun: dryrun doesn't execute quries.
 
     Returns:
@@ -157,7 +157,7 @@ def drop_tables(db_instance, mode, dryrun):
 
     Args:
         db_instance: a database instance.
-        mode: prod/dev mode.
+        mode: prod/dev/test mode.
         dryrun: dryrun doesn't execute quries.
 
     Returns:
@@ -168,7 +168,7 @@ def drop_tables(db_instance, mode, dryrun):
     """
     with db_instance.connect() as conn:
         stmt = sqlalchemy.text(
-                "DROP TABLE {mode}_posts_serving;".format(mode=mode))
+                "DROP TABLE IF EXISTS {mode}_posts_serving;".format(mode=mode))
         if dryrun:
             print("SQL query to execute: \n%s" % stmt)
         else:
@@ -176,7 +176,7 @@ def drop_tables(db_instance, mode, dryrun):
             conn.execute(stmt)
 
         stmt = sqlalchemy.text(
-                "DROP TABLE {mode}_comments;".format(mode=mode))
+                "DROP TABLE IF EXISTS {mode}_comments;".format(mode=mode))
         if dryrun:
             print("SQL query to execute: \n%s" % stmt)
         else:
@@ -184,7 +184,7 @@ def drop_tables(db_instance, mode, dryrun):
             conn.execute(stmt)
 
         stmt = sqlalchemy.text(
-                "DROP TABLE {mode}_users;".format(mode=mode))
+                "DROP TABLE IF EXISTS {mode}_users;".format(mode=mode))
         if dryrun:
             print("SQL query to execute: \n%s" % stmt)
         else:
@@ -200,22 +200,23 @@ def main(argv):
         --mode: {prod, dev} prod/dev mode for a table set.
         --dryrun: {true, false} dryrun doesn't execute the queries.
     """
-    mode = "dev"
+    mode = "test"
     dryrun = True
 
     try:
         opts, _ = getopt.getopt(argv,"hm:d:",["mode=","dryrun="])
     except getopt.GetoptError:
-        print("reset_database.py -m <mode: prod, dev(default)> -d <dryrun: true(default), false>")
+        # pylint: disable=line-too-long
+        print("reset_database.py -m <mode: prod, dev, test(default)> -d <dryrun: true(default), false>")
         sys.exit(2)
     for opt, arg in opts:
         if opt == "-h":
             # pylint: disable=line-too-long
-            print("reset_database.py -m <mode: prod, dev(default)> -d <dryrun: true(default), false>")
+            print("reset_database.py -m <mode: prod, dev, test(default)> -d <dryrun: true(default), false>")
             sys.exit()
         elif opt in ("-m", "--mode"):
             mode = arg
-            if mode not in ("prod", "dev"):
+            if mode not in ("prod", "dev", "test"):
                 print("Unknown 'mode': %s", mode)
                 sys.exit(2)
         elif opt in ("-d", "--dryrun"):

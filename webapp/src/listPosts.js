@@ -13,7 +13,7 @@ import CardMedia from "@material-ui/core/CardMedia";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Typography from "@material-ui/core/Typography";
 
-import * as Constants from "./constants.js";
+import { getApiServerPath } from "./constants.js";
 
 const useStyles = makeStyles({
   root: {
@@ -65,7 +65,7 @@ const ListPosts = () => {
   const style = useStyles();
 
   useEffect(() => {
-    fetch(Constants.API_SERVER_PATH + "list_posts", {
+    fetch(getApiServerPath() + "list_posts", {
       method: "GET",
     })
       .then((response) => response.json())
@@ -86,10 +86,7 @@ const ListPosts = () => {
 
   const fetchMoreData = () => {
     const url =
-      Constants.API_SERVER_PATH +
-      "list_posts?start=" +
-      posts.length +
-      "&count=10";
+      getApiServerPath() + "list_posts?start=" + posts.length + "&count=10";
 
     fetch(url, {
       method: "GET",

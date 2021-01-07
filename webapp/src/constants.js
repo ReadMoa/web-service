@@ -1,3 +1,8 @@
 // The base path for ReadMoa APIs.
-export const API_SERVER_PATH = "http://127.0.0.1:8080/api/";
-// export const API_SERVER_PATH = "/api/";
+export function getApiServerPath() {
+  if (process.env.NODE_ENV === "production") {
+    return "/api/";
+  }
+  // If the environment is 'development' or 'testing'.
+  return "http://127.0.0.1:8080/api/";
+}

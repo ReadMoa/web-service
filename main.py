@@ -15,9 +15,9 @@ from flask_cors import CORS
 
 # For crawling a webpage.
 import requests
-import sqlalchemy
-from util import database
 from util import url as url_util
+from util.post import Post
+from util.post_db import PostDB
 
 # Max post index to return in /api/list_posts
 MAX_POSTS_TO_START = 1000
@@ -27,8 +27,7 @@ app = Flask(__name__)
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 logger = logging.getLogger()
 
-
-db = database.init_connection_engine()
+post_db = PostDB(DATABASE_MODE)
 
 @app.before_first_request
 def google_service_init():
@@ -93,35 +92,14 @@ def view_page(path):
     Args:
       path: 96bit (24 hexadecimal digits) post key.
     """
-    post = {}
-    with db.connect() as conn:
-        # Execute the query and fetch all results
-        returned_posts = conn.execute("""
-            SELECT post_url_hash, post_url, title, submission_time, main_image_url, description, 
-                   user_display_name, user_email, user_photo_url, user_id, user_provider_id 
-            FROM {mode}_posts_serving 
-            where post_url_hash = '{key}'
-            """.format(mode=DATABASE_MODE, key=path)
-        ).fetchall()
-        # Convert the results into a list of dicts representing votes
-        if len(returned_posts) <= 0:
-            # 404
-            return Response(
+    post = post_db.lookup(path)
+
+    if not post:
+        return Response(
                 status=404,
-                response="The post is not available.",
-            )
+                response="The post is not available.")
 
-        row = returned_posts[0]
-        post = {
-                "post_url_hash": row[0],
-                "post_url": row[1],
-                "title": row[2],
-                "submission_time": row[3],
-                "main_image_url": row[4],
-                "description": row[5]}
-
-    return render_template(
-        "view_post.html", post=post)
+    return render_template("view_post.html", post=post)
 
 # Returns a full URL from og:url.
 def get_full_url(parent_url, og_url):
@@ -160,37 +138,22 @@ def api_list_posts():
     start_idx = 0
     if request.args.get("start") is not None:
         start_idx = int(request.args.get("start"))
-        if start_idx < 0 or start_idx > MAX_POSTS_TO_START:
-            start_idx = 0
 
     count = 10
     if request.args.get("count") is not None:
         count = int(request.args.get("count"))
-        if count < 0 or count > MAX_POSTS_TO_START:
-            count = 10
+
+    recent_posts = post_db.scan(start_idx=start_idx, count=count)
 
     posts = []
-    with db.connect() as conn:
-        # Execute the query and fetch all results
-        recent_posts = conn.execute("""
-            SELECT post_url_hash, post_url, title, submission_time, main_image_url, description, 
-                   user_display_name, user_email, user_photo_url, user_id, user_provider_id 
-            FROM {mode}_posts_serving 
-            ORDER BY submission_time DESC LIMIT {limit:d}
-            """.format(mode=DATABASE_MODE, limit=start_idx + count)
-        ).fetchall()
-        # Convert the results into a list of dicts representing votes
-        if len(recent_posts) < start_idx:
-            return jsonify(posts=[])
-
-        for row in recent_posts[start_idx:]:
-            posts.append({
-                "post_url_hash": row[0],
-                "post_url": row[1],
-                "title": row[2],
-                "submission_time": row[3],
-                "main_image_url": row[4],
-                "description": row[5]})
+    for post in recent_posts:
+        posts.append({
+            "post_url_hash": post.post_url_hash,
+            "post_url": post.post_url,
+            "title": post.title,
+            "submission_time": post.submission_time,
+            "main_image_url": post.main_image_url,
+            "description": post.description})
     return jsonify(posts=posts)
 
 # JSON data format for request.
@@ -246,38 +209,20 @@ def api_add_post():
         if each_text.get('property') == 'og:description':
             description = each_text.get('content')
 
-    url_hash = url_util.url_to_hashkey(url)
-    time_cast = datetime.datetime.utcnow()
+    post = Post(
+            post_url=url, title=title, main_image_url=main_image,
+            description=description, user_display_name="모아인",
+            user_provider_id="Moain", user_id="Moain")
+    post_db.insert(post)
 
-    userid = ''
-
-    stmt = sqlalchemy.text("""
-        INSERT INTO {mode}_posts_serving 
-          (post_url_hash, post_url, submission_time, user_id, 
-           title, main_image_url, description) 
-         VALUES 
-          (:url_hash, :url, :time_cast, :userid, 
-           :title, :main_image, :description)
-        """.format(mode=DATABASE_MODE)
-    )
-
-    logger.warning(stmt)
-
-    try:
-        with db.connect() as conn:
-            conn.execute(
-                    stmt, url_hash=url_hash, url=url,
-                    time_cast=time_cast, userid=userid,
-                    title=title, main_image=main_image,
-                    description=description)
-    except db.Error as ex:
-        logger.exception(ex)
-        return Response(
-            status=500,
-            response="INSERT operation failed.",
-        )
-
-    return jsonify(post=post)
+    return_post = {
+            "post_url_hash": post.post_url_hash,
+            "post_url": post.post_url,
+            "title": post.title,
+            "submission_time": post.submission_time,
+            "main_image_url": post.main_image_url,
+            "description": post.description}
+    return jsonify(post=return_post)
 
 @app.route('/sitemap.xml')
 def sitemap_xml():
@@ -298,26 +243,14 @@ def sitemap_xml():
     Returns:
       sitemap.xml data.
     """
-    posts = []
-    with db.connect() as conn:
-        # Execute the query and fetch all results
-        recent_posts = conn.execute("""
-            SELECT post_url_hash, post_url, title, submission_time, main_image_url
-            FROM {mode}_posts_serving 
-            ORDER BY submission_time DESC LIMIT {limit:d}
-            """.format(mode=DATABASE_MODE, limit=1000)
-        ).fetchall()
+    recent_posts = post_db.scan(count=1000)
+    modified_posts = []
+    for post in recent_posts:
+        modified_posts.append({
+            "post_url": post.post_url,
+            "submission_date": post.submission_time.date()})
 
-        for row in recent_posts:
-            posts.append({
-                "post_url_hash": row[0],
-                "post_url": row[1],
-                "title": row[2],
-                "submission_date": row[3].date(),
-                "main_image_url": row[4]}
-                )
-
-    template = render_template('sitemap.xml', posts=posts)
+    template = render_template('sitemap.xml', posts=modified_posts)
     response = make_response(template)
     response.headers['Content-Type'] = 'application/xml'
     return response

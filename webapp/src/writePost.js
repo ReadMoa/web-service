@@ -6,7 +6,7 @@ import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 
-import * as Constants from "./constants.js";
+import { getApiServerPath } from "./constants.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -22,7 +22,7 @@ function WritePost() {
   const history = useHistory();
 
   const onSubmit = (e) => {
-    fetch(Constants.API_SERVER_PATH + "add_post", {
+    fetch(getApiServerPath() + "add_post", {
       method: "POST",
       mode: "cors",
       headers: {

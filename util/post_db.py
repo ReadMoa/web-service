@@ -85,7 +85,6 @@ class PostDB:
         #       to make the result consistent even when there is a new item
         #       to posts_serving db.
         posts = []
-        start_idx = 0
         if start_idx < 0 or start_idx > MAX_POSTS_TO_START:
             logger.warning("start_idx is out of range: %d", start_idx)
             return posts  # Empty list

@@ -6,13 +6,14 @@ to the post table.
   Typical usage example:
   $ PYTHONPATH=./ python3 tools/rss_crawler/main.py
 """
-import datetime
+from datetime import datetime, timezone
 import logging
 import os
 import time
 
-import requests
+from dateutil.parser import parse
 from bs4 import BeautifulSoup
+import requests
 from util import url as url_util
 from util.post import Post
 from util.post_db import PostDB
@@ -26,6 +27,7 @@ RSS_FEED_FILE = "feeds.txt"
 MAX_SUMMARY_LENGTH = 150
 DATABASE_MODE = "prod"
 MAX_NUM_RECORDS_TO_READ_PER_FEED = 1
+AGE_LIMIT_FOR_PAGE = 86400  # seconds
 
 post_db = PostDB(DATABASE_MODE)
 
@@ -104,11 +106,12 @@ def read_rss(rss_content):
                 continue
 
             updated = ''
-            if not i.pubDate:
-                updated = i.pubdate.text
-            else:
-                updated = i.pubDate.text
-
+            if i.find("pubDate"):
+                updated = i.find("pubDate").get_text()                
+                age = int((datetime.now(timezone.utc) - parse(updated)).total_seconds())
+                if age > AGE_LIMIT_FOR_PAGE:
+                    logger.info("Too old - %s, %ds ago", updated, age)
+                    continue
             author = ""
             if not i.author:
                 author = i.find("dc:creator").get_text()
@@ -130,7 +133,6 @@ def read_rss(rss_content):
 
             if num_entries > MAX_NUM_RECORDS_TO_READ_PER_FEED:
                 break
-
     elif soup.feed:
         for i in soup.find_all("entry"):
             url = i.find("link")["href"]
@@ -143,6 +145,14 @@ def read_rss(rss_content):
             key = url_util.url_to_hashkey(url)
             if post_db.lookup(key):
                 continue
+
+            updated = ''
+            if i.find("pubDate"):
+                updated = i.find("pubDate").get_text()
+                age = int((datetime.now(timezone.utc) - parse(updated)).total_seconds())
+                if (age > AGE_LIMIT_FOR_PAGE):
+                    logger.info("Too old - %s, %ds ago", updated, age)
+                    continue
 
             num_entries += 1
             content_list.append({

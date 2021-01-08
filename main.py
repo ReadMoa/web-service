@@ -2,7 +2,6 @@
 
 Provide handlers for APIs, static images/HTMLs.
 """
-from datetime import datetime
 import logging
 import os
 from urllib.parse import urlparse, urljoin
@@ -15,7 +14,6 @@ from flask_cors import CORS
 
 # For crawling a webpage.
 import requests
-from util import url as url_util
 from util.post import Post
 from util.post_db import PostDB
 

@@ -57,10 +57,10 @@ function MainApp() {
                 ReadMoa
               </Typography>
               <Button href="/" color="inherit">
-                Home
+                홈
               </Button>
               <Button href="/write_post" color="inherit">
-                Add
+                글추가
               </Button>
             </Toolbar>
           </AppBar>

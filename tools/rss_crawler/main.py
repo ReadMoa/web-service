@@ -266,8 +266,7 @@ def main():
                 "Incoming link: Key - %s, Main image - %s",
                 record["key"], record["main_image"])
         add_content_to_database(parsed_content)
-
-        print("RSS processing completed for ", feed_url)
+        print("RSS processing completed for %s (%d new posts)" % (feed_url, len(parsed_content)))
     print("The full RSS import completed.")
 
 

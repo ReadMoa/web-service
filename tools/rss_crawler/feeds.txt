@@ -232,4 +232,5 @@ https://brunch.co.kr/rss/@@3q0C
 https://brunch.co.kr/rss/@@pCo
 # 뱅크샐러드(Brunch) - 책
 https://brunch.co.kr/rss/@@1ozp
-
+# 식육마케터 김태경(Brunch) - 책
+https://brunch.co.kr/rss/@@T8j

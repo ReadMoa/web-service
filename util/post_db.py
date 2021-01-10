@@ -51,7 +51,8 @@ class PostDB:
         with self.db_instance.connect() as conn:
             # Execute the query and fetch all results
             returned_posts = conn.execute("""
-                SELECT post_url_hash, post_url, title, submission_time, main_image_url, description, 
+                SELECT post_url_hash, post_url, post_author, post_published_date,
+                    title, submission_time, main_image_url, description, 
                     user_display_name, user_email, user_photo_url, user_id, user_provider_id 
                 FROM {mode}_posts_serving 
                 where post_url_hash = '{key}'
@@ -61,11 +62,12 @@ class PostDB:
             if len(returned_posts) > 0:
                 row = returned_posts[0]
                 post = Post(
-                    post_url=row[1], title=row[2], submission_time=row[3],
-                    main_image_url=row[4], description=row[5],
-                    user_display_name=row[6], user_email=row[7],
-                    user_photo_url=row[8], user_id=row[9],
-                    user_provider_id=row[10])
+                    post_url=row[1], title=row[2], author=row[3],
+                    published_date=row[4], submission_time=row[5],
+                    main_image_url=row[6], description=row[7],
+                    user_display_name=row[8], user_email=row[9],
+                    user_photo_url=row[10], user_id=row[11],
+                    user_provider_id=row[12])
         return post
 
     def scan(self, start_idx=0, count=10):
@@ -96,8 +98,10 @@ class PostDB:
         with self.db_instance.connect() as conn:
             # Execute the query and fetch all results
             recent_posts = conn.execute("""
-                SELECT post_url_hash, post_url, title, submission_time, main_image_url, description, 
-                    user_display_name, user_email, user_photo_url, user_id, user_provider_id 
+                SELECT post_url_hash, post_url, title, post_author,
+                    post_published_date, submission_time, main_image_url,
+                    description, user_display_name, user_email, user_photo_url,
+                    user_id, user_provider_id 
                 FROM {mode}_posts_serving 
                 ORDER BY submission_time DESC LIMIT {limit:d}
                 """.format(mode=self.mode, limit=start_idx + count)
@@ -107,11 +111,12 @@ class PostDB:
                 for row in recent_posts[start_idx:]:
                     posts.append(
                         Post(
-                            post_url=row[1], title=row[2], submission_time=row[3],
-                            main_image_url=row[4], description=row[5],
-                            user_display_name=row[6], user_email=row[7],
-                            user_photo_url=row[8], user_id=row[9],
-                            user_provider_id=row[10]
+                            post_url=row[1], title=row[2], author=row[3],
+                            published_date=row[4], submission_time=row[5],
+                            main_image_url=row[6], description=row[7],
+                            user_display_name=row[8], user_email=row[9],
+                            user_photo_url=row[10], user_id=row[11],
+                            user_provider_id=row[12]
                         )
                     )
         return posts
@@ -128,13 +133,15 @@ class PostDB:
 
         stmt = sqlalchemy.text("""
             INSERT INTO {mode}_posts_serving 
-            (post_url_hash, post_url, submission_time, 
-            title, main_image_url, description,
-            user_id, user_display_name, user_email, user_photo_url, user_provider_id) 
+            (post_url_hash, post_url, post_author, post_published_date,
+            submission_time, title, main_image_url, description,
+            user_id, user_display_name, user_email, user_photo_url,
+            user_provider_id) 
             VALUES 
-            (:url_hash, :url, :submission_time, :title, 
-            :main_image_url, :description, :user_id,
-            :user_display_name, :user_email, :user_photo_url, :user_provider_id)
+            (:url_hash, :url, :author, :published_date, :submission_time,
+            :title, :main_image_url, :description, :user_id,
+            :user_display_name, :user_email, :user_photo_url,
+            :user_provider_id)
             """.format(mode=self.mode)
         )
 
@@ -144,6 +151,7 @@ class PostDB:
             with self.db_instance.connect() as conn:
                 conn.execute(
                         stmt, url_hash=post.post_url_hash, url=post.post_url,
+                        author=post.author, published_date=post.published_date,
                         submission_time=post.submission_time,
                         title=post.title, main_image_url=post.main_image_url,
                         description=post.description, user_id=post.user_id,

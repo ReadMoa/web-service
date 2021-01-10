@@ -3,7 +3,7 @@
 Drop tables and recreate them. Add a record to each table.
 
   Typical usage example:
-  $ reset_database.py -m <mode: prod, dev> -d <dryrun: true, false>
+  $ reset_database.py -m <mode: prod, dev, test(default)> -d <dryrun: true, false>
 """
 
 import datetime
@@ -40,6 +40,8 @@ def create_tables(db_instance, mode, dryrun):
             CREATE TABLE IF NOT EXISTS {mode}_posts_serving (
             post_url_hash CHAR(24) NOT NULL, 
             post_url  TEXT(2084) NOT NULL, 
+            post_author VARCHAR(255),
+            post_published_date DATETIME,
             submission_time DATETIME, 
             title TEXT(1024), 
             main_image_url TEXT(2084), 
@@ -108,13 +110,15 @@ def create_tables(db_instance, mode, dryrun):
 
     stmt = sqlalchemy.text("""
         INSERT INTO {mode}_posts_serving (
-          post_url_hash, post_url, submission_time, title, main_image_url, description, 
+          post_url_hash, post_url, post_author, post_published_date,
+          submission_time, title, main_image_url, description, 
           user_display_name, user_email, user_photo_url, user_provider_id, user_id, 
           featured_comment, featured_comment_submission_time, 
           featured_comment_user_display_name, featured_comment_user_email, 
           featured_comment_user_photo_url, featured_comment_user_id) 
         VALUES (
-          :post_url_hash, :post_url, :submission_time, :title, :main_image_url, :description, 
+          :post_url_hash, :post_url, :post_author, :post_published_date,
+          :submission_time, :title, :main_image_url, :description, 
           :user_display_name, :user_email, :user_photo_url, :user_provider_id, :user_id, 
           :featured_comment, :featured_comment_submission_time, 
           :featured_comment_user_display_name, :featured_comment_user_email, 
@@ -133,6 +137,8 @@ def create_tables(db_instance, mode, dryrun):
             conn.execute(
                 stmt, post_url_hash="deadbeafdeadbeafdeadbeaf",
                 post_url="https://news.v.daum.net/v/20200816080119455", submission_time=time_now,
+                post_author="test",
+                post_published_date=time_now,
                 title="美 입양한인 \"나를 잃어버린 부모 눈물의 나날 보내고 있을 것\"",
                 # pylint: disable=line-too-long
                 main_image_url="https://img1.daumcdn.net/thumb/S1200x630/?fname=https://t1.daumcdn.net/news/202008/16/yonhap/20200816080119500cqms.jpg",

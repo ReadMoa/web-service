@@ -11,55 +11,34 @@
   items = reader.read(count=10)
 """
 import logging
-import time
+from urllib.parse import urlparse
 
-from bs4 import BeautifulSoup, Comment
+from bs4 import BeautifulSoup
+from dateutil.parser import parse
 
-import requests
 
 logger = logging.getLogger()
 
 MAX_NUM_RECORDS_TO_READ_PER_FEED = 10000
 MAX_SUMMARY_LENGTH = 150
 
-def fetch_main_image_from_post(page_url):
-    """Fetch the main image link from the input page.
+class FeedItem:
+    """FeedItem to hold an item from a feed.
 
-    This involves calling external web servers.
-
-    Args:
-      page_url: The document URL (can be a frameset document).
-
-    Returns:
-      Fetch a main image URL (og:image for now).
+    Attributes:
+      url string: The URL of an item.
+      title string: The title of an item.
+      description string: The description.
+      published_date datetime: The published date of an item.
+      author string: The author of an item.
     """
-    source_code = requests.get(page_url).text
-    main_soup = BeautifulSoup(source_code, "html.parser")
-
-    # TODO: Improve this to avoid calling inefficient sleeps.
-    time.sleep(2)
-
-    # Crawl and parse a webpage.
-    if (page_url.startswith("https://blog.naver.com")
-        or page_url.startswith("http://blog.naver.com")):
-        main_frame_url = main_soup.find(id="mainFrame")["src"]
-        main_frame_url = "https://blog.naver.com" + main_frame_url
-        logger.info("Naver blog's main frame: %s", main_frame_url)
-
-        main_frame_source_code = requests.get(main_frame_url).text
-        main_soup = BeautifulSoup(main_frame_source_code, "html.parser")
-
-        # TODO: Improve this to avoid calling inefficient sleeps.
-        time.sleep(1)
-
-    main_image = ""
-    for each_text in main_soup.findAll("meta"):
-        if each_text.get("property") == "og:image":
-            main_image = each_text.get("content")
-            logger.info("Extracted main image URL: %s", main_image)
-            break
-
-    return main_image
+    def __init__(
+        self, url, title, description, published_date, author):
+        self.url = url
+        self.title = title
+        self.description = description
+        self.published_date = published_date
+        self.author = author
 
 
 def extract_from_post(html):
@@ -81,29 +60,10 @@ def extract_from_post(html):
     for text in summary_soup.find_all(text=True):
         summary += "{} ".format(text)
         if len(summary) > MAX_SUMMARY_LENGTH:
-            break       
+            break
 
     logger.info("Extracted summary: %s", summary[:MAX_SUMMARY_LENGTH])
     return summary[:MAX_SUMMARY_LENGTH]
-
-
-class FeedItem:
-    """FeedItem to hold an item from a feed.
-
-    Attributes:
-      url: The URL of an item.
-      title: The title of an item.
-      description: The description.
-      published_date: The published date of an item.
-      author: The author of an item.
-    """
-    def __init__(
-        self, url, title, description, published_date, author):
-        self.url = url
-        self.title = title
-        self.description = description
-        self.published_date = published_date
-        self.author = author
 
 # <rss version="2.0">
 #   <channel>
@@ -139,11 +99,11 @@ class RssReader:
 
             updated = ""
             if i.find("pubDate"):
-                updated = i.find("pubDate").get_text()
+                updated = parse(i.find("pubDate").get_text())
 
             author = ""
-            if not i.author:
-                author = i.find("dc:creator").get_text()
+            if i.find("author"):
+                author = i.find("author").get_text()
 
             title = i.title.text
             description = extract_from_post(i.description.text)
@@ -186,7 +146,7 @@ class AtomReader:
 
             updated = ''
             if i.find("updated"):
-                updated = i.find("updated").get_text()
+                updated = parse(i.find("updated").get_text())
             author = i.find("author").find("name").get_text()
             description = extract_from_post(i.find("summary").get_text())
             title = i.find("title").get_text()
@@ -198,6 +158,34 @@ class AtomReader:
 
         return items
 
+def infer_feed_type(url, content):
+    """Infer feed type from URL and its content
+
+    Args:
+      url (string): A feed URL.
+      content (string)
+
+    Returns:
+      An extracted string from the RSS summary record.
+    """
+    # Infer from URL.
+    parsed_url = urlparse(url)
+
+    # Brunch RSS URLs e.g. https://brunch.co.kr/rss/@@iDz
+    if parsed_url.hostname.endswith("brunch.co.kr") and "rss/@@" in url:
+        return "RSS"
+
+    # Infer from content.
+    soup = BeautifulSoup(content, "xml")
+
+    if soup.rss:
+        return "RSS"
+    elif soup.feed:
+        # Could be more stable to check xmlns in
+        #   <feed xmlns="http://www.w3.org/2005/Atom"...
+        return "ATOM"
+    else:
+        return "UNKNOWN"
 
 class FeedReaderFactory:
     """FeedReaderFactory class to return a feed reader.

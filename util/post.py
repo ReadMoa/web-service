@@ -16,6 +16,7 @@
 from datetime import datetime
 
 from util.url import url_to_hashkey
+from util.page_metadata import fetch_main_image_from_post
 
 
 class Post:
@@ -28,8 +29,9 @@ class Post:
       Various fields (see the first __init__ function).
     """
     def __init__(
-        self, post_url, title, main_image_url = "", description = "",
-        user_display_name = "리드모아", user_email = "admin@readmoa.net",
+        self, post_url, title, author, published_date, main_image_url = "",
+        description = "", user_display_name = "리드모아",
+        user_email = "admin@readmoa.net",
         user_photo_url = "/static/readmoa_profile.png",
         user_provider_id = "ReadMoa", user_id = "ReadMoa",
         submission_time = datetime.utcnow()):
@@ -37,6 +39,8 @@ class Post:
         self.post_url_hash = url_to_hashkey(post_url)
         self.key = self.post_url_hash
         self.title = title
+        self.author = author
+        self.published_date = published_date
         self.main_image_url = main_image_url
         self.description = description
         self.user_display_name = user_display_name
@@ -71,3 +75,21 @@ class Post:
             return False
 
         return True
+
+def post_from_feed_item(feed_item):
+    """Creates a Post from a FeedItem data.
+
+    Args:
+        feed_item (util.feed_reader_factory.FeedItem): a FeedItem data.
+    """
+    # Fetches the main image link from the post because FeedItem data
+    # doesn't have main image link.
+    # NOTE: fetch_main_image_from_post has artificial delays for
+    # external connection.
+    main_image_url = fetch_main_image_from_post(feed_item.url)
+
+    return Post(
+        post_url=feed_item.url, title=feed_item.title,
+        author=feed_item.author, published_date=feed_item.published_date,
+        description=feed_item.description,
+        main_image_url=main_image_url)

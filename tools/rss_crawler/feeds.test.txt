@@ -1,1 +1,2 @@
+# Feed type: RSS
 https://brunch.co.kr/rss/@@1Kt0

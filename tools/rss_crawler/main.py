@@ -26,8 +26,8 @@ logger = logging.getLogger()
 
 RSS_FEED_FILE = "feeds.txt"
 DATABASE_MODE = "prod"
-MAX_NUM_RECORDS_TO_READ_PER_FEED = 3
-AGE_LIMIT_FOR_PAGE = 86400 * 3 # seconds
+MAX_NUM_RECORDS_TO_READ_PER_FEED = 2
+AGE_LIMIT_FOR_PAGE = 86400 * 1 # seconds
 
 post_db = PostDB(DATABASE_MODE)
 
@@ -99,7 +99,7 @@ def main():
             if age.total_seconds() > AGE_LIMIT_FOR_PAGE:
                 logging.info("Too old - %s, %s ago", post.published_date, age)
                 continue
-            
+
             if not post_db.lookup(post.key):
                 num_new_posts += 1
                 post_db.insert(post)

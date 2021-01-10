@@ -34,7 +34,7 @@ class Post:
         user_email = "admin@readmoa.net",
         user_photo_url = "/static/readmoa_profile.png",
         user_provider_id = "ReadMoa", user_id = "ReadMoa",
-        submission_time = datetime.utcnow()):
+        submission_time = None):
         self.post_url = post_url
         self.post_url_hash = url_to_hashkey(post_url)
         self.key = self.post_url_hash
@@ -48,7 +48,10 @@ class Post:
         self.user_photo_url = user_photo_url
         self.user_provider_id = user_provider_id
         self.user_id = user_id
-        self.submission_time = submission_time
+        if submission_time is None:
+            self.submission_time = datetime.utcnow()
+        else:
+            self.submission_time = submission_time
 
     def __str__(self):
         """Returns a human-readable string.

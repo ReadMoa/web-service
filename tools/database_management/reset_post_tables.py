@@ -3,7 +3,7 @@
 Drop tables and recreate them. Add a record to each table.
 
   Typical usage example:
-  $ reset_database.py -m <mode: prod, dev, test(default)> -d <dryrun: true, false>
+  $ reset_post_tables.py -m <mode: prod, dev, test(default)> -d <dryrun: true, false>
 """
 
 import datetime
@@ -213,12 +213,12 @@ def main(argv):
         opts, _ = getopt.getopt(argv,"hm:d:",["mode=","dryrun="])
     except getopt.GetoptError:
         # pylint: disable=line-too-long
-        print("reset_database.py -m <mode: prod, dev, test(default)> -d <dryrun: true(default), false>")
+        print("reset_post_tables.py -m <mode: prod, dev, test(default)> -d <dryrun: true(default), false>")
         sys.exit(2)
     for opt, arg in opts:
         if opt == "-h":
             # pylint: disable=line-too-long
-            print("reset_database.py -m <mode: prod, dev, test(default)> -d <dryrun: true(default), false>")
+            print("reset_post_tables.py -m <mode: prod, dev, test(default)> -d <dryrun: true(default), false>")
             sys.exit()
         elif opt in ("-m", "--mode"):
             mode = arg

@@ -1,4 +1,4 @@
-"""Reset tables in the backend database.
+"""Reset post tables in the backend database.
 
 Drop tables and recreate them. Add a record to each table.
 

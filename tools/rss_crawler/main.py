@@ -9,12 +9,8 @@ to the post table.
 from datetime import datetime, timezone
 import logging
 import os
-import time
 
-from dateutil.parser import parse
-from bs4 import BeautifulSoup
 import requests
-from util import url as url_util
 from util.post import post_from_feed_item
 from util.post_db import PostDB
 from util.feed_reader_factory import FeedReaderFactory, infer_feed_type
@@ -26,8 +22,8 @@ logger = logging.getLogger()
 
 RSS_FEED_FILE = "feeds.txt"
 DATABASE_MODE = "prod"
-MAX_NUM_RECORDS_TO_READ_PER_FEED = 2
-AGE_LIMIT_FOR_PAGE = 86400 * 1 # seconds
+MAX_NUM_RECORDS_TO_READ_PER_FEED = 10
+AGE_LIMIT_FOR_PAGE = 86400 * 21 # seconds
 
 post_db = PostDB(DATABASE_MODE)
 

@@ -73,9 +73,16 @@ class RssReader:
     Attributes:
       feed_content: The content of the feed.
     """
-
     def __init__(self, feed_content):
         self.feed_content = feed_content
+        self.feed_soup = BeautifulSoup(self.feed_content, "xml")
+
+        channel = self.feed_soup.rss.channel
+        self.author = ""
+        self.title = channel.title.text
+        self.description = channel.description.text
+        self.language = channel.language.text
+        self.generator = channel.generator.text
 
     def read(self, count=1):
         """Parses the RSS feed and returns 'count' number of items.
@@ -86,10 +93,9 @@ class RssReader:
         Returns:
           A list of items parsed from the feed.
         """
-        soup = BeautifulSoup(self.feed_content, "xml")
         items = []
         num_entries = 0
-        for i in soup.findAll("item"):
+        for i in self.feed_soup.findAll("item"):
             if num_entries >= count:
                 break
 
@@ -125,6 +131,15 @@ class AtomReader:
     """
     def __init__(self, feed_content):
         self.feed_content = feed_content
+        self.feed_soup = BeautifulSoup(self.feed_content, "xml")
+
+        feed = self.feed_soup.feed
+        self.author = feed.author.name.text
+        self.title = feed.title.text
+        self.language = ""
+        self.description = ""
+        self.generator = ""
+
 
     def read(self, count=1):
         """Parses the ATOM feed and returns 'count' number of items.
@@ -135,10 +150,9 @@ class AtomReader:
         Returns:
           A list of items parsed from the feed.
         """
-        soup = BeautifulSoup(self.feed_content, "xml")
         items = []
         num_entries = 0
-        for i in soup.find_all("entry"):
+        for i in self.feed_soup.find_all("entry"):
             if num_entries >= count:
                 break
 

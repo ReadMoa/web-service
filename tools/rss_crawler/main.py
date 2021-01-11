@@ -22,8 +22,8 @@ logger = logging.getLogger()
 
 RSS_FEED_FILE = "feeds.txt"
 DATABASE_MODE = "prod"
-MAX_NUM_RECORDS_TO_READ_PER_FEED = 10
-AGE_LIMIT_FOR_PAGE = 86400 * 21 # seconds
+MAX_NUM_RECORDS_TO_READ_PER_FEED = 2
+AGE_LIMIT_FOR_PAGE = 86400 * 1 # seconds
 
 post_db = PostDB(DATABASE_MODE)
 

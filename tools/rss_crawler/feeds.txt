@@ -193,7 +193,7 @@ https://brunch.co.kr/rss/@@4YAk
 # 정희(Brunch) - 책
 https://brunch.co.kr/rss/@@334
 # 윤영돈 코치(Brunch) - 책
-https://brunch.co.kr/rss/@@15pS
+#https://brunch.co.kr/rss/@@15pS
 # OIAA 오아(Brunch) - 책
 https://brunch.co.kr/rss/@@1NpW
 

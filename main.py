@@ -152,7 +152,9 @@ def api_list_posts():
             "submission_time": post.submission_time,
             "main_image_url": post.main_image_url,
             "description": post.description})
-    return jsonify(posts=posts)
+    response = make_response(jsonify(posts=posts))
+    response.cache_control.max_age = 300
+    return response
 
 # JSON data format for request.
 # {
@@ -206,11 +208,15 @@ def api_add_post():
                 )
         if each_text.get('property') == 'og:description':
             description = each_text.get('content')
+    # Can't extract the published date yet.
+    published_date = 0
+    author = ""
 
     post = Post(
             post_url=url, title=title, main_image_url=main_image,
             description=description, user_display_name="모아인",
-            user_provider_id="Moain", user_id="Moain")
+            user_provider_id="Moain", user_id="Moain",
+            published_date=published_date, author=author)
     post_db.insert(post)
 
     return_post = {
@@ -220,7 +226,9 @@ def api_add_post():
             "submission_time": post.submission_time,
             "main_image_url": post.main_image_url,
             "description": post.description}
-    return jsonify(post=return_post)
+    response = make_response(jsonify(post=return_post))
+    response.cache_control.max_age = 300
+    return response
 
 @app.route('/sitemap.xml')
 def sitemap_xml():

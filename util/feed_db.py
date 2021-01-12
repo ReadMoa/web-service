@@ -156,7 +156,7 @@ class FeedDB:
             logger.exception(ex)
             return
 
-    def delete(self, url_key):
+    def delete_feed(self, url_key):
         """Deletes a feed from feeds table with the input key.
 
         Args:

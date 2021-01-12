@@ -12,7 +12,7 @@ import sys
 import requests
 from util.feed import Feed
 from util.feed_db import FeedDB
-from util.feed_reader_factory import FeedReaderFactory
+from util.feed_reader_factory import FeedReaderFactory, infer_feed_type
 from util.url import url_to_hashkey
 
 logger = logging.getLogger()
@@ -68,6 +68,8 @@ def main(argv):
                 feed_doc.status_code, feed_doc.url)
         sys.exit(2)
 
+    if not feed_type:
+        feed_type = infer_feed_type(url, feed_doc.content)
     reader = FeedReaderFactory().get_reader(
             feed_type=feed_type, url=url, feed_content=feed_doc.content)
 

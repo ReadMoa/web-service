@@ -15,31 +15,12 @@ from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
-
+from util.feed import FeedItem
 
 logger = logging.getLogger()
 
 MAX_NUM_RECORDS_TO_READ_PER_FEED = 10000
 MAX_SUMMARY_LENGTH = 150
-
-class FeedItem:
-    """FeedItem to hold an item from a feed.
-
-    Attributes:
-      url string: The URL of an item.
-      title string: The title of an item.
-      description string: The description.
-      published_date datetime: The published date of an item.
-      author string: The author of an item.
-    """
-    def __init__(
-        self, url, title, description, published_date, author):
-        self.url = url
-        self.title = title
-        self.description = description
-        self.published_date = published_date
-        self.author = author
-
 
 def extract_from_post(html):
     """Extracts summary text from a RSS summary record.

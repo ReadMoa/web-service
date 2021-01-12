@@ -18,6 +18,24 @@
 """
 from util.url import url_to_hashkey
 
+class FeedItem:
+    """FeedItem to hold an item from a feed.
+
+    Attributes:
+      url string: The URL of an item.
+      title string: The title of an item.
+      description string: The description.
+      published_date datetime: The published date of an item.
+      author string: The author of an item.
+    """
+    def __init__(
+        self, url, title, description, published_date, author):
+        self.url = url
+        self.title = title
+        self.description = description
+        self.published_date = published_date
+        self.author = author
+
 class Feed:
     """Feed class representing a web feed.
 

@@ -67,7 +67,8 @@ def create_tables(db_instance, mode, dryrun):
     url VARCHAR(2084) NOT NULL, 
     feed_url_key CHAR(24) NOT NULL, 
     published_date DATETIME,
-    PRIMARY KEY(url_key) 
+    PRIMARY KEY(url_key),
+    FOREIGN KEY (feed_url_key) REFERENCES {mode}_feeds(url_key)
   );
             """.format(mode=mode)
         )

@@ -117,6 +117,20 @@ def view_page(path):
 
     return render_template("index.html", post=post)
 
+@app.route("/write_post", methods=["GET"])
+def write_post():
+    """Renders write_post page.
+
+    Renders write_post page.
+    """
+    # Creates a fake Post object for populating meta data for index.html.
+    post = Post(
+            post_url="", author="", title="리드모아 - 읽을거리 추가하기",
+            description="다른 사람들과 함께 읽을거리를 추가해주세요.",
+            published_date=None)
+
+    return render_template("index.html", post=post)
+
 @app.route("/", methods=["GET"])
 def main_page():
     """Renders the root(/) page.

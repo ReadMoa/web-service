@@ -27,25 +27,6 @@ env_variables:
   PRIVACY_ADMIN_PHONE: { privacy admin phone }
 
 handlers:
-  - url: /static
-    static_dir: webapp/build/static
-    secure: always
-
-  - url: /(.*\.png)$
-    static_files: webapp/build/\1
-    upload: webapp/build/.*\.(png)$
-    secure: always
-
-  - url: /favicon.ico
-    static_files: webapp/build/favicon.ico
-    upload: webapp/build/favicon.ico
-    secure: always
-
-  - url: /(.*\.(json|js))$
-    static_files: webapp/build/\1
-    upload: webapp/build/.*\.(json|js)$
-    secure: always
-
   - url: /api/add_post
     script: auto
     secure: always
@@ -54,16 +35,6 @@ handlers:
     script: auto
     secure: always
 
-  - url: /p/
-    script: auto
-    secure: always
-
   - url: /
-    static_files: webapp/build/index.html
-    upload: webapp/build/index.html
-    secure: always
-
-  - url: /write_post
-    static_files: webapp/build/index.html
-    upload: webapp/build/index.html
+    script: auto
     secure: always

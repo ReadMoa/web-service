@@ -14,7 +14,7 @@ function IFrameContainer(props) {
 
 const ViewPost = (props) => {
   return (
-    <Box width="380px">
+    <Box width="100%">
       <IFrameContainer message={props.message} />
     </Box>
   );

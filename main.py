@@ -21,7 +21,7 @@ from util.post_db import PostDB
 MAX_POSTS_TO_START = 1000
 DATABASE_MODE = "prod"
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='webapp/build')
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 logger = logging.getLogger()
 
@@ -57,7 +57,6 @@ def page_terms():
     """
     return render_template("terms.html")
 
-# TODO: Use a more efficient way to serve static files e.g. nginx.
 @app.route("/favicon.ico", methods=["GET"])
 def resource_favicon():
     """Returns the favicon file.
@@ -67,7 +66,6 @@ def resource_favicon():
     """
     return send_from_directory("static", "favicon.ico")
 
-# TODO: Use a more efficient way to serve static files e.g. nginx.
 @app.route('/images/<path:path>')
 def serve_image(path):
     """Returns a image file.
@@ -80,7 +78,27 @@ def serve_image(path):
     """
     return send_from_directory('static/images', path)
 
-# TODO: Move this (page view) logic to React from Flask template rendering.
+@app.route('/static/<path>/<filename>', methods=["GET"])
+def serve_static(path, filename):
+    """Returns a static file.
+
+    Args:
+      path: A path to a static file.
+
+    Returns:
+      An image file from /static/ directory.
+    """
+    return send_from_directory(os.path.join("webapp/build/static", path), filename)
+
+@app.route('/manifest.json')
+def manifest_json():
+    """Returns manifest.json file.
+
+    Returns:
+      manifest.json
+    """
+    return send_from_directory('webapp/build', 'manifest.json')
+
 @app.route("/p/<path:path>", methods=["GET"])
 def view_page(path):
     """Renders a view_post page (/p/)
@@ -97,7 +115,35 @@ def view_page(path):
                 status=404,
                 response="The post is not available.")
 
-    return render_template("view_post.html", post=post)
+    return render_template("index.html", post=post)
+
+@app.route("/write_post", methods=["GET"])
+def write_post():
+    """Renders write_post page.
+
+    Renders write_post page.
+    """
+    # Creates a fake Post object for populating meta data for index.html.
+    post = Post(
+            post_url="", author="", title="리드모아 - 읽을거리 추가하기",
+            description="다른 사람들과 함께 읽을거리를 추가해주세요.",
+            published_date=None)
+
+    return render_template("index.html", post=post)
+
+@app.route("/", methods=["GET"])
+def main_page():
+    """Renders the root(/) page.
+
+    Renders the root page.
+    """
+    # Creates a fake Post object for populating meta data for index.html.
+    post = Post(
+            post_url="", author="", title="리드모아 - 다양한 읽을거리, 더 읽을 거리",
+            description="읽을거리가 필요하신가요? 리드모아에서 시간을 보내세요. 읽을거리가 여러분을 찾아갑니다.",
+            published_date=None)
+
+    return render_template("index.html", post=post)
 
 # Returns a full URL from og:url.
 def get_full_url(parent_url, og_url):
@@ -153,7 +199,7 @@ def api_list_posts():
             "main_image_url": post.main_image_url,
             "description": post.description})
     response = make_response(jsonify(posts=posts))
-    response.cache_control.max_age = 300
+    response.cache_control.max_age = 30
     return response
 
 # JSON data format for request.
@@ -162,7 +208,6 @@ def api_list_posts():
 #   "comment": "..."
 #   "idtoken": "..."
 # }
-# TODO: Refactor the duplicate code with add_post_submit().
 # TODO: Didn't test this function.
 @app.route('/api/add_post', methods=["POST"])
 def api_add_post():
@@ -227,7 +272,7 @@ def api_add_post():
             "main_image_url": post.main_image_url,
             "description": post.description}
     response = make_response(jsonify(post=return_post))
-    response.cache_control.max_age = 300
+    response.cache_control.max_age = 30
     return response
 
 @app.route('/sitemap.xml')

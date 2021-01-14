@@ -17,6 +17,7 @@ import Typography from "@material-ui/core/Typography";
 import "./index.css";
 import ListPosts from "./listPosts";
 import WritePost from "./writePost";
+import ViewPost from "./viewPost";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -32,6 +33,8 @@ const useStyles = makeStyles((theme) => ({
 
 function MainApp() {
   const classes = useStyles();
+
+  const el = document.getElementById("root");
 
   return (
     <Router>
@@ -68,6 +71,9 @@ function MainApp() {
 
         <Box display="flex" justifyContent="center">
           <Switch>
+            <Route path="/p/:post_url_key">
+              <ViewPost message={el.getAttribute("data-param")} />
+            </Route>
             <Route path="/write_post">
               <WritePost />
             </Route>

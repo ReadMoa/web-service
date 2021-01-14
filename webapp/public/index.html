@@ -41,11 +41,19 @@
       href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500%7CRoboto:300,400,500,700%7CPoppins:300,400,500,600,700"
       media="all"
     />
-    <title>리드모아 - 다양한 읽을거리, 더 읽을 거리</title>
-    <meta name="description" content="읽을거리가 떨어지셨나요? 리드모아에서 시간을 보내세요."></head>
+    <title>{{post.title}}</title>
+
+    <meta name="description" content="{{post.description}}" />
+    <meta property="og:title" content="{{post.title}}" />
+    <meta property="og:description" content="{{post.description}}" />
+    <meta property="og:image" content="{{post.main_image_url}}" />
+
+    <meta name="robots" content="max-image-preview:standard" />
+    <meta name="robots" content="max-video-preview:-1" />
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
+
+    <div id="root" data-param="{{post.post_url}}"></div>
   </body>
 </html>

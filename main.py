@@ -21,7 +21,7 @@ from util.post_db import PostDB
 MAX_POSTS_TO_START = 1000
 DATABASE_MODE = "prod"
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='webapp/build')
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 logger = logging.getLogger()
 
@@ -80,6 +80,30 @@ def serve_image(path):
     """
     return send_from_directory('static/images', path)
 
+#/static
+@app.route('/static/<path>/<filename>', methods=["GET"])
+def serve_static(path, filename):
+    """Returns a static file.
+
+    Args:
+      path: A path to a static file.
+
+    Returns:
+      An image file from /static/ directory.
+    """
+    # pylint: disable=no-member
+    app.logger.info("PATH: [%s/%s]", os.path.join("static", path), filename)
+    return send_from_directory(os.path.join("webapp/build/static", path), filename)
+
+@app.route('/manifest.json')
+def manifest_json():
+    """Returns manifest.json file.
+
+    Returns:
+      manifest.json
+    """
+    return send_from_directory('webapp/build', 'manifest.json')
+
 # TODO: Move this (page view) logic to React from Flask template rendering.
 @app.route("/p/<path:path>", methods=["GET"])
 def view_page(path):
@@ -97,7 +121,20 @@ def view_page(path):
                 status=404,
                 response="The post is not available.")
 
-    return render_template("view_post.html", post=post)
+    return render_template("index.html", post=post)
+    #return render_template("index.html", post=post)
+
+@app.route("/", methods=["GET"])
+def main_page():
+    """Renders the root(/) page.
+
+    Renders the root page.
+    """
+    # Creates a fake Post object for populating meta data for index.html.
+    post = Post(post_url="", author="", title="리드모아 - 다양한 읽을거리, 더 읽을 거리",
+    description="읽을거리가 떨어지셨나요? 리드모아에서 시간을 보내세요.", published_date=None)
+
+    return render_template("index.html", post=post)
 
 # Returns a full URL from og:url.
 def get_full_url(parent_url, og_url):
@@ -153,7 +190,7 @@ def api_list_posts():
             "main_image_url": post.main_image_url,
             "description": post.description})
     response = make_response(jsonify(posts=posts))
-    response.cache_control.max_age = 300
+    response.cache_control.max_age = 30
     return response
 
 # JSON data format for request.
@@ -227,7 +264,7 @@ def api_add_post():
             "main_image_url": post.main_image_url,
             "description": post.description}
     response = make_response(jsonify(post=return_post))
-    response.cache_control.max_age = 300
+    response.cache_control.max_age = 30
     return response
 
 @app.route('/sitemap.xml')

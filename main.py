@@ -57,7 +57,6 @@ def page_terms():
     """
     return render_template("terms.html")
 
-# TODO: Use a more efficient way to serve static files e.g. nginx.
 @app.route("/favicon.ico", methods=["GET"])
 def resource_favicon():
     """Returns the favicon file.
@@ -67,7 +66,6 @@ def resource_favicon():
     """
     return send_from_directory("static", "favicon.ico")
 
-# TODO: Use a more efficient way to serve static files e.g. nginx.
 @app.route('/images/<path:path>')
 def serve_image(path):
     """Returns a image file.
@@ -80,7 +78,6 @@ def serve_image(path):
     """
     return send_from_directory('static/images', path)
 
-#/static
 @app.route('/static/<path>/<filename>', methods=["GET"])
 def serve_static(path, filename):
     """Returns a static file.
@@ -91,8 +88,6 @@ def serve_static(path, filename):
     Returns:
       An image file from /static/ directory.
     """
-    # pylint: disable=no-member
-    app.logger.info("PATH: [%s/%s]", os.path.join("static", path), filename)
     return send_from_directory(os.path.join("webapp/build/static", path), filename)
 
 @app.route('/manifest.json')
@@ -104,7 +99,6 @@ def manifest_json():
     """
     return send_from_directory('webapp/build', 'manifest.json')
 
-# TODO: Move this (page view) logic to React from Flask template rendering.
 @app.route("/p/<path:path>", methods=["GET"])
 def view_page(path):
     """Renders a view_post page (/p/)
@@ -122,7 +116,6 @@ def view_page(path):
                 response="The post is not available.")
 
     return render_template("index.html", post=post)
-    #return render_template("index.html", post=post)
 
 @app.route("/", methods=["GET"])
 def main_page():
@@ -131,8 +124,10 @@ def main_page():
     Renders the root page.
     """
     # Creates a fake Post object for populating meta data for index.html.
-    post = Post(post_url="", author="", title="리드모아 - 다양한 읽을거리, 더 읽을 거리",
-    description="읽을거리가 떨어지셨나요? 리드모아에서 시간을 보내세요.", published_date=None)
+    post = Post(
+            post_url="", author="", title="리드모아 - 다양한 읽을거리, 더 읽을 거리",
+            description="읽을거리가 필요하신가요? 리드모아에서 시간을 보내세요. 읽을거리가 여러분을 찾아갑니다.",
+            published_date=None)
 
     return render_template("index.html", post=post)
 
@@ -199,7 +194,6 @@ def api_list_posts():
 #   "comment": "..."
 #   "idtoken": "..."
 # }
-# TODO: Refactor the duplicate code with add_post_submit().
 # TODO: Didn't test this function.
 @app.route('/api/add_post', methods=["POST"])
 def api_add_post():

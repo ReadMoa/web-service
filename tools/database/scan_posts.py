@@ -1,7 +1,7 @@
 """Scan Post table
 
 Commands:
-$ PYTHONPATH=./ python3 tools/database_management/scan_posts.py --mode=test --rows=10
+$ PYTHONPATH=./ python3 tools/database/scan_posts.py --mode=test --rows=10
 """
 import getopt
 import sys

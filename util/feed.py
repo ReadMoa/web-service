@@ -16,6 +16,7 @@
 
   feed_db.insert(feed)
 """
+from datetime import datetime
 from util.url import url_to_hashkey
 
 class FeedItem:
@@ -49,7 +50,8 @@ class Feed:
             feed_type = "RSS", changerate = 0, label = "",
             generator = "", popularity = 0, first_fetched_time = 0,
             latest_fetched_time = 0, latest_item_url = "",
-            latest_item_title = ""):
+            latest_item_title = "",
+            scheduled_fetch_time = 0):
         if url_key == "":
             self.url_key = url_to_hashkey(url)
         else:
@@ -67,6 +69,10 @@ class Feed:
         self.latest_fetched_time = latest_fetched_time
         self.latest_item_url = latest_item_url
         self.latest_item_title = latest_item_title
+        if scheduled_fetch_time == 0:
+            self.scheduled_fetch_time = datetime.utcnow()
+        else:
+            self.scheduled_fetch_time = scheduled_fetch_time
 
     def __str__(self):
         """Returns a human-readable string.

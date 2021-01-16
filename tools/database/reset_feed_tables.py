@@ -35,13 +35,14 @@ def create_tables(db_instance, mode, dryrun):
         # Create posts_serving if not exist.
         stmt = sqlalchemy.text("""
   CREATE TABLE IF NOT EXISTS {mode}_feeds (
-    url_key CHAR(24) NOT NULL, 
-    url VARCHAR(2084) NOT NULL, 
+    url_key CHAR(24) NOT NULL,
+    url VARCHAR(2084) NOT NULL,
     title VARCHAR(128),
     label VARCHAR(255),
     description VARCHAR(2048), 
     language VARCHAR(6),
     changerate INT,
+    scheduled_fetch_time DATETIME,
     generator VARCHAR(64),
     feed_type VARCHAR(8),
     popularity INT,
@@ -63,12 +64,32 @@ def create_tables(db_instance, mode, dryrun):
         # Create feed_items if not exist.
         stmt = sqlalchemy.text("""
   CREATE TABLE IF NOT EXISTS {mode}_feed_items (
-    url_key CHAR(24) NOT NULL, 
-    url VARCHAR(2084) NOT NULL, 
-    feed_url_key CHAR(24) NOT NULL, 
+    url_key CHAR(24) NOT NULL,
+    url VARCHAR(2084) NOT NULL,
+    feed_url_key CHAR(24) NOT NULL,
     published_date DATETIME,
     PRIMARY KEY(url_key),
     FOREIGN KEY (feed_url_key) REFERENCES {mode}_feeds(url_key)
+  );
+            """.format(mode=mode)
+        )
+
+        if dryrun:
+            print("SQL query to execute: \n%s" % stmt)
+        else:
+            print("Executing the following command: \n%s" % stmt)
+            conn.execute(stmt)
+
+        # Create feed_fetch_log if not exist.
+        stmt = sqlalchemy.text("""
+  CREATE TABLE IF NOT EXISTS {mode}_feed_fetch_log (
+    url_key CHAR(24) NOT NULL,
+    fetched_time DATETIME,
+    feed_updated BOOLEAN,
+    newest_post_published_date DATETIME,
+    previous_changerate INT,
+    previous_scheduled_fetch_time DATETIME,
+    FOREIGN KEY (url_key) REFERENCES {mode}_feeds(url_key)
   );
             """.format(mode=mode)
         )
@@ -95,7 +116,7 @@ def drop_tables(db_instance, mode, dryrun):
     """
     with db_instance.connect() as conn:
         stmt = sqlalchemy.text(
-                "  DROP TABLE IF EXISTS {mode}_feeds;".format(mode=mode))
+                "  DROP TABLE IF EXISTS {mode}_feed_fetch_log;".format(mode=mode))
         if dryrun:
             print("SQL query to execute: \n%s" % stmt)
         else:
@@ -104,6 +125,14 @@ def drop_tables(db_instance, mode, dryrun):
 
         stmt = sqlalchemy.text(
                 "  DROP TABLE IF EXISTS {mode}_feed_items;".format(mode=mode))
+        if dryrun:
+            print("SQL query to execute: \n%s" % stmt)
+        else:
+            print("Executing the following command: \n%s" % stmt)
+            conn.execute(stmt)
+
+        stmt = sqlalchemy.text(
+                "  DROP TABLE IF EXISTS {mode}_feeds;".format(mode=mode))
         if dryrun:
             print("SQL query to execute: \n%s" % stmt)
         else:

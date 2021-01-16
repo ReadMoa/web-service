@@ -1,7 +1,7 @@
 """Scan Feeds table
 
 Commands:
-$ PYTHONPATH=./ python3 tools/database_management/scan_feeds.py --mode=test --rows=10
+$ PYTHONPATH=./ python3 tools/database/scan_feeds.py --mode=test --rows=10
 """
 import getopt
 import sys
@@ -19,13 +19,13 @@ def main(argv):
         opts, _ = getopt.getopt(argv,"hm:r:o:",["mode=","rows=","output="])
     except getopt.GetoptError:
         # pylint: disable=line-too-long
-        print("scan_posts.py -m <mode: prod, dev, test(default)> -r <rows>"
+        print("scan_feeds.py -m <mode: prod, dev, test(default)> -r <rows>"
               " -o <output: concise, verbose>")
         sys.exit(2)
     for opt, arg in opts:
         if opt == "-h":
             # pylint: disable=line-too-long
-            print("scan_posts.py -m <mode: prod, dev, test(default)> -r <rows>"
+            print("scan_feeds.py -m <mode: prod, dev, test(default)> -r <rows>"
                   " -o <output: concise, verbose>")
             sys.exit()
         elif opt in ("-m", "--mode"):
@@ -54,6 +54,7 @@ def main(argv):
     Label: {label}
     First fetched time: {first_fetched_time}
     Latest fetched time: {latest_fetched_time}
+    Scheduled fetch time: {scheduled_fetch_time}
     Latest item URL: {latest_item_url}
     Latest item title: {latest_item_title}
     """.format(
@@ -64,7 +65,8 @@ def main(argv):
                 first_fetched_time=feed.first_fetched_time,
                 latest_fetched_time=feed.latest_fetched_time,
                 latest_item_url=feed.latest_item_url,
-                latest_item_title=feed.latest_item_title))
+                latest_item_title=feed.latest_item_title,
+                scheduled_fetch_time=feed.scheduled_fetch_time))
         else:
             print("Post[{url_key}] {url}".format(url_key=feed.url_key, url=feed.url))
 

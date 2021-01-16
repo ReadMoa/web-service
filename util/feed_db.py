@@ -25,9 +25,7 @@ from util.database import init_connection_engine
 from util.feed import Feed
 
 logger = logging.getLogger()
-
 MAX_CHANGERATE = 14 * 86400
-
 
 def calculate_changerate(events):
     """Calculate the changerate from feed event logs.

@@ -132,7 +132,7 @@ def main(argv):
 
     total_new_posts = 0
     rss_import_start_time = datetime.utcnow()
-    print("[RSS import] began at %s" % (datetime.utcnow()))
+    print("[RSS import] began at %s" % (rss_import_start_time))
     for feed in feeds:
         if datetime.utcnow() > feed.scheduled_fetch_time:
             print("RSS processing started for ", feed.url)

@@ -18,7 +18,7 @@ def main(argv):
     feed_url = ""
 
     try:
-        opts, _ = getopt.getopt(argv,"hm:r:o:",["mode=","rows=","feed_url="])
+        opts, _ = getopt.getopt(argv,"hm:r:f:",["mode=","rows=","feed_url="])
     except getopt.GetoptError:
         # pylint: disable=line-too-long
         print("scan_feed_fetch_logs.py -m <mode: prod, dev, test(default)>"

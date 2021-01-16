@@ -12,7 +12,7 @@ while read line; do
     [[ "$line" =~ ^#.*$ ]] && continue
     [ -z "$line" ] && continue
     # reading each line
-    echo Insert to Feeds table: $line
+    echo Insert into Feeds table: $line
     PYTHONPATH=./ python3 tools/database/add_a_feed.py --mode=$mode --url=$line
 done < $filename
 

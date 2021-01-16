@@ -215,7 +215,7 @@ https://brunch.co.kr/rss/@@33X
 # 심두보(Brunch) - 책
 https://brunch.co.kr/rss/@@S4d
 # 꿈꾸는자본가(Brunch) - 책
-https://brunch.co.kr/rss/@@1c8F
+#https://brunch.co.kr/rss/@@1c8F
 # 조던 JD부자연구소소장(Brunch) - 책
 https://brunch.co.kr/rss/@@234D
 # 최윤섭(Brunch) - 책

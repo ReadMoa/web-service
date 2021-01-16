@@ -298,6 +298,7 @@ def sitemap_xml():
     modified_posts = []
     for post in recent_posts:
         modified_posts.append({
+            "post_url_hash": post.post_url_hash,
             "post_url": post.post_url,
             "submission_date": post.submission_time.date()})
 

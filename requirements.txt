@@ -8,3 +8,4 @@ requests==2.24.0
 beautifulsoup4==4.9.0
 flask-cors
 lxml==4.6.2
+pytz

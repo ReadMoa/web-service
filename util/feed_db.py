@@ -17,6 +17,7 @@
 
   feed_db.insert(feed)
 """
+from datetime import timedelta
 import logging
 
 import sqlalchemy
@@ -24,6 +25,38 @@ from util.database import init_connection_engine
 from util.feed import Feed
 
 logger = logging.getLogger()
+MAX_CHANGERATE = 14 * 86400
+
+def calculate_changerate(events):
+    """Calculate the changerate from feed event logs.
+
+    Args:
+        events: A list of events. An event data looks:
+            {
+                "url_key"
+                "fetched_time"
+                "feed_updated"
+                "newest_post_published_date"
+                "previous_changerate"
+                "previous_scheduled_fetch_time"
+            }
+
+    Returns:
+        The calculated changerate in seconds.
+    """
+    # A simple algorithm to calculate a changerate.
+    # changerate = (latest feed fetched time) - (published time of the
+    #               newest post)
+    events.sort(key=lambda e:e["fetched_time"], reverse=True)
+
+    duration = events[0]["fetched_time"] - events[0]["newest_post_published_date"]
+
+    if duration.seconds <= 0:
+        return 86400   # default: 1 day
+    elif duration.seconds > MAX_CHANGERATE:
+        return MAX_CHANGERATE
+    else:
+        return duration.seconds
 
 class FeedDB:
     """FeedDB class to interact with the feeds table.
@@ -53,7 +86,7 @@ class FeedDB:
                 SELECT url_key, url, title, changerate, feed_type, label,
                        language, description, generator, popularity,
                        first_fetched_time, latest_fetched_time, latest_item_url,
-                       latest_item_title
+                       latest_item_title, scheduled_fetch_time
                 FROM {mode}_feeds
                 where url_key = '{url_key}'
                 """.format(mode=self.mode, url_key=url_key)
@@ -66,8 +99,44 @@ class FeedDB:
                         language=row[6], description=row[7], generator=row[8],
                         popularity=row[9], first_fetched_time=row[10],
                         latest_fetched_time=row[11], latest_item_url=row[12],
-                        latest_item_title=row[13])
+                        latest_item_title=row[13],
+                        scheduled_fetch_time=row[14])
         return feed
+
+    def update_changerate(self, url_key):
+        """Updates the changerate of a feed.
+
+        Call this method after a new log event for a feed completed.
+        It will calculate a new changerate and update Feeds table.
+
+        Args:
+          url_key: A hash of a feed URL.
+        """
+        with self.db_instance.connect() as conn:
+            log_db = FeedFetchLogDB(self.mode)
+            events = log_db.scan(url_key, count=10)
+            changerate = calculate_changerate(events)
+
+            # Sort events in reverse chronological order.
+            events.sort(key=lambda e:e["fetched_time"], reverse=True)
+            latest_fetched_time = events[0]["fetched_time"]
+            scheduled_fetch_time = latest_fetched_time + timedelta(seconds=changerate)
+            logger.info(
+                "New changerate for [%s]: %d (latest fetch:%s)",
+                url_key, changerate, latest_fetched_time)
+            conn.execute("""
+                UPDATE {mode}_feeds
+                SET
+                  changerate = {changerate},
+                  latest_fetched_time = '{latest_fetched_time}',
+                  scheduled_fetch_time = '{scheduled_fetch_time}'
+                WHERE url_key = '{url_key}'
+                """.format(
+                    mode=self.mode, changerate=changerate,
+                    latest_fetched_time=latest_fetched_time,
+                    scheduled_fetch_time=scheduled_fetch_time,
+                    url_key=url_key)
+            )
 
     def scan_feeds(self, start_idx=0, count=10):
         """Scans Feeds table and resturns a list of feeds.
@@ -97,7 +166,7 @@ class FeedDB:
                 SELECT url_key, url, title, changerate, feed_type, label,
                        language, description, generator, popularity,
                        first_fetched_time, latest_fetched_time, latest_item_url,
-                       latest_item_title
+                       latest_item_title, scheduled_fetch_time
                 FROM {mode}_feeds
                 ORDER BY latest_fetched_time DESC LIMIT {limit:d}
                 """.format(mode=self.mode, limit=start_idx + count)
@@ -111,7 +180,8 @@ class FeedDB:
                         language=row[6], description=row[7], generator=row[8],
                         popularity=row[9], first_fetched_time=row[10],
                         latest_fetched_time=row[11], latest_item_url=row[12],
-                        latest_item_title=row[13]))
+                        latest_item_title=row[13],
+                        scheduled_fetch_time=row[14]))
 
         return feeds
 
@@ -129,12 +199,13 @@ class FeedDB:
             INSERT INTO {mode}_feeds
             (url_key, url, feed_type, title, changerate,  label,
             language, description, generator, popularity, first_fetched_time,
-            latest_fetched_time, latest_item_url, latest_item_title)
+            latest_fetched_time, latest_item_url, latest_item_title,
+            scheduled_fetch_time)
             VALUES 
             (:url_key, :url, :feed_type, :title, :changerate, :label,
             :language, :description, :generator, :popularity,
             :first_fetched_time, :latest_fetched_time, :latest_item_url,
-            :latest_item_title)
+            :latest_item_title, :scheduled_fetch_time)
             """.format(mode=self.mode)
         )
 
@@ -151,7 +222,8 @@ class FeedDB:
                         first_fetched_time=feed.first_fetched_time,
                         latest_fetched_time=feed.latest_fetched_time,
                         latest_item_url=feed.latest_item_url,
-                        latest_item_title=feed.latest_item_title)
+                        latest_item_title=feed.latest_item_title,
+                        scheduled_fetch_time=feed.scheduled_fetch_time)
         except self.db_instance.Error as ex:
             logger.exception(ex)
             return
@@ -168,3 +240,92 @@ class FeedDB:
                 where url_key = '{url_key}'
                 """.format(mode=self.mode, url_key=url_key)
             )
+
+
+class FeedFetchLogDB:
+    """FeedFetchLogDB class to interact with feed_fetch_log table.
+
+    FeedDB provides log, scan operations for feed fetching events.
+
+    Attributes:
+      ...
+    """
+    def __init__(self, mode="dev"):
+        self.db_instance = init_connection_engine()
+        self.mode = mode
+
+    def log(
+        self, url_key, fetched_time, feed_updated, newest_post_published_date,
+        previous_changerate, previous_scheduled_fetch_time):
+        """Logs a fetching event for a feed.
+
+        Args:
+          url_key (string): A hash of a feed URL.
+          fetched_time (datetime): The time the fetching event happened.
+          feed_updated (bool): Is the feed updated when it was fetched?
+          newest_post_published_date (datetime): The published date of the
+            newest post when it was fetched.
+          previous_changerate (int): The estimated changerate when the event
+            happened.
+          previous_scheduled_fetch_time (DATETIME): The next scheduled fetch
+            time when the event happened.
+
+        Returns:
+          True if successful.
+        """
+        stmt = sqlalchemy.text("""
+            INSERT INTO {mode}_feed_fetch_log
+            (url_key, fetched_time, feed_updated, newest_post_published_date,
+             previous_changerate, previous_scheduled_fetch_time)
+            VALUES 
+            (:url_key, :fetched_time, :feed_updated,
+             :newest_post_published_date, :previous_changerate,
+             :previous_scheduled_fetch_time)
+            """.format(mode=self.mode)
+        )
+
+        logger.info(stmt)
+
+        try:
+            with self.db_instance.connect() as conn:
+                conn.execute(
+                        stmt, url_key=url_key, fetched_time=fetched_time,
+                        feed_updated=feed_updated,
+                        newest_post_published_date=newest_post_published_date,
+                        previous_changerate=previous_changerate,
+                        previous_scheduled_fetch_time=previous_scheduled_fetch_time)
+        except self.db_instance.Error as ex:
+            logger.exception(ex)
+            return
+
+    def scan(self, url_key, count=100):
+        """Scan logs for a feed.
+
+        Args:
+          url_key (string): A hash of a feed URL.
+          count (int): # of log events to return (reverse chronological).
+
+        Returns:
+          A list of logs.
+        """
+        events = []
+        with self.db_instance.connect() as conn:
+            # Execute the query and fetch all results
+            recent_events = conn.execute("""
+                SELECT url_key, fetched_time, feed_updated,
+                  newest_post_published_date,
+                  previous_changerate, previous_scheduled_fetch_time
+                FROM {mode}_feed_fetch_log
+                where url_key = '{url_key}'
+                ORDER BY fetched_time DESC LIMIT {limit:d}
+                """.format(mode=self.mode, url_key=url_key, limit=count)
+            ).fetchall()
+
+            for row in recent_events:
+                events.append({
+                    "url_key":row[0], "fetched_time":row[1],
+                    "feed_updated":row[2],
+                    "newest_post_published_date":row[3],
+                    "previous_changerate":row[4],
+                    "previous_scheduled_fetch_time":row[5]})
+        return events

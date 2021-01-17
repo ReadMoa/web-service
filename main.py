@@ -64,7 +64,7 @@ def resource_favicon():
     Returns:
       favicon.ico.
     """
-    return send_from_directory("static", "favicon.ico")
+    return send_from_directory("webapp/build/images", "favicon.ico")
 
 @app.route('/images/<path:path>')
 def serve_image(path):
@@ -76,7 +76,7 @@ def serve_image(path):
     Returns:
       An image file from /static/images directory.
     """
-    return send_from_directory('static/images', path)
+    return send_from_directory('webapp/build/images', path)
 
 @app.route('/static/<path>/<filename>', methods=["GET"])
 def serve_static(path, filename):

@@ -39,12 +39,6 @@ function MainApp() {
   return (
     <Router>
       <div style={{ width: "100%" }}>
-        <div
-          id="g_id_onload"
-          data-client_id="460880639448-1t9uj6pc9hcr9dvfmvm7sqm03vv3k2th.apps.googleusercontent.com"
-          data-login_uri="https://fanjang.appspot.com/tokensignin"
-        ></div>
-
         <Box display="flex" justifyContent="center">
           <AppBar position="static">
             <Toolbar>

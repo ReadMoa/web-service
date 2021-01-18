@@ -6,8 +6,8 @@ import Box from "@material-ui/core/Box";
 
 function IFrameContainer(props) {
   return (
-    <div class="iframe-container">
-      <iframe src={props.message}></iframe>
+    <div className="iframe-container">
+      <iframe src={props.message} title="View Post Frame"></iframe>
     </div>
   );
 }

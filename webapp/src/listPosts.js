@@ -14,6 +14,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import Typography from "@material-ui/core/Typography";
 
 import { getApiServerPath } from "./constants.js";
+import InstantPostView from "./instantViewPost.js";
 
 const useStyles = makeStyles({
   root: {
@@ -27,9 +28,18 @@ const useStyles = makeStyles({
 function ImgMediaCard(props) {
   const classes = useStyles();
 
+  function handleClick(event) {
+    // Open InstantViewPost dialog when an item in the list was clicked.
+    props.handleOpenModalView();
+    // These two handlers will set the states in the parent component to pass
+    // the URL and page_view URL to the InstantViewPost component.
+    props.handleSelectPost(props.postUrl);
+    props.handleViewPageUrl(props.viewPageUrl);
+  }
+
   return (
     <Card className={classes.box}>
-      <CardActionArea className={classes.root} href={props.viewPageUrl}>
+      <CardActionArea className={classes.root} onClick={handleClick}>
         <CardMedia
           component="img"
           alt={props.title}
@@ -47,22 +57,35 @@ function ImgMediaCard(props) {
         </CardContent>
       </CardActionArea>
       <CardActions>
-        <Button size="small" color="primary">
-          Learn More
-        </Button>
-        <Button size="small" color="primary" href={props.viewPageUrl}>
-          Read
+        <Button size="small" color="primary" onClick={handleClick}>
+          엿보기
         </Button>
       </CardActions>
     </Card>
   );
 }
 
-const ListPosts = () => {
+const ListPosts = (props) => {
   const [posts, setPosts] = useState(Array.from({ length: 0 }));
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const style = useStyles();
+
+  // 'open' state indicates (or triggers) to open the InstantViewPost modal
+  // dialog.
+  const [open, setOpen] = React.useState(false);
+  // These two states are for ImgMediaCard to pass the post URL and the page
+  // view URL to the InstantViewPost component.
+  const [selectedPost, setSelectedPost] = useState("");
+  const [viewPageUrl, setViewPageUrl] = useState("");
+
+  const handleOpenModalView = () => {
+    setOpen(true);
+  };
+
+  const handleCloseModalView = () => {
+    setOpen(false);
+  };
 
   useEffect(() => {
     fetch(getApiServerPath() + "list_posts", {
@@ -126,10 +149,20 @@ const ListPosts = () => {
               postUrl={post.post_url}
               // Change "/p/" to "http://localhost:8080/p/" for development or test.
               viewPageUrl={"/p/" + post.post_url_hash}
+              handleOpenModalView={handleOpenModalView}
+              handleSelectPost={setSelectedPost}
+              handleViewPageUrl={setViewPageUrl}
             />
           </div>
         ))}
       </InfiniteScroll>
+
+      <InstantPostView
+        postUrl={selectedPost}
+        viewPageUrl={viewPageUrl}
+        openModalView={open}
+        handleCloseModalView={handleCloseModalView}
+      />
     </Box>
   );
 };

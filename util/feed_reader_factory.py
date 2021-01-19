@@ -10,6 +10,7 @@
       feed_type=feed_type, url=url, feed_content=feed.content)
   items = reader.read(count=10)
 """
+import html
 import logging
 from urllib.parse import urlparse
 
@@ -22,7 +23,7 @@ logger = logging.getLogger()
 MAX_NUM_RECORDS_TO_READ_PER_FEED = 10000
 MAX_SUMMARY_LENGTH = 150
 
-def extract_from_post(html):
+def extract_from_post(html_text):
     """Extracts summary text from a RSS summary record.
 
     Truncates if the text exceeds the threshold.
@@ -33,13 +34,14 @@ def extract_from_post(html):
     Returns:
       An extracted string from the RSS summary record.
     """
-    summary_soup = BeautifulSoup(html, "html.parser")
+    summary_soup = BeautifulSoup(html_text, "html.parser")
     summary = ""
     if summary_soup.body:
         summary_soup = summary_soup.body
 
     for text in summary_soup.find_all(text=True):
-        summary += "{} ".format(text)
+        unescaped_text = html.unescape(text)
+        summary += "{} ".format(unescaped_text)
         if len(summary) > MAX_SUMMARY_LENGTH:
             break
 
@@ -90,9 +92,9 @@ class RssReader:
 
             author = ""
             if i.find("author"):
-                author = i.find("author").get_text()
+                author = html.unescape(i.find("author").get_text())
 
-            title = i.title.text
+            title = html.unescape(i.title.text)
             description = extract_from_post(i.description.text)
 
             items.append(FeedItem(
@@ -142,9 +144,9 @@ class AtomReader:
             updated = ''
             if i.find("updated"):
                 updated = parse(i.find("updated").get_text())
-            author = i.find("author").find("name").get_text()
+            author = html.unescape(i.find("author").find("name").get_text())
             description = extract_from_post(i.find("summary").get_text())
-            title = i.find("title").get_text()
+            title = html.unescape(i.find("title").get_text())
 
             items.append(FeedItem(
                 url=url, title=title, description=description,

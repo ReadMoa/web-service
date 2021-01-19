@@ -143,7 +143,9 @@ def main_page():
             description="읽을거리가 필요하신가요? 리드모아에서 시간을 보내세요. 읽을거리가 여러분을 찾아갑니다.",
             published_date=None)
 
-    return render_template("index.html", post=post)
+    prefetch_url = "/api/list_posts"
+
+    return render_template("index.html", post=post, prefetch_url=prefetch_url)
 
 # Returns a full URL from og:url.
 def get_full_url(parent_url, og_url):

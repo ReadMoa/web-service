@@ -107,22 +107,25 @@ def main(argv):
         N/A
     """
     mode = "test"
+    force_fetch = False
     try:
-        opts, _ = getopt.getopt(argv,"hm:",["mode="])
+        opts, _ = getopt.getopt(argv,"hm:f:",["mode=", "force_fetch"])
     except getopt.GetoptError:
         # pylint: disable=line-too-long
-        print("main.py -m <mode: prod, dev, test(default)>")
+        print("main.py -m <mode: prod, dev, test(default)> -f ")
         sys.exit(2)
     for opt, arg in opts:
         if opt == "-h":
             # pylint: disable=line-too-long
-            print("main.py -m <mode: prod, dev, test(default)>")
+            print("main.py -m <mode: prod, dev, test(default)> -f ")
             sys.exit()
         elif opt in ("-m", "--mode"):
             mode = arg
             if mode not in ("prod", "dev", "test"):
                 print("Unknown 'mode': %s", mode)
                 sys.exit(2)
+        elif opt in ("-f", "--force_fetch"):
+            force_fetch = True
 
     post_db = PostDB(mode)
     feed_db = FeedDB(mode)
@@ -134,7 +137,7 @@ def main(argv):
     rss_import_start_time = datetime.utcnow()
     print("[RSS import] began at %s" % (rss_import_start_time))
     for feed in feeds:
-        if datetime.utcnow() > feed.scheduled_fetch_time:
+        if force_fetch or datetime.utcnow() > feed.scheduled_fetch_time:
             print("RSS processing started for ", feed.url)
             num_new_posts = process_feed(feed_db, post_db, log_db, feed.url)
             total_new_posts += num_new_posts

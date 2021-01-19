@@ -55,5 +55,16 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
 
     <div id="root" data-param="{{post.post_url}}"></div>
+    <!-- Prefetch a JSON resource to display items faster. JSON resources like
+         /api/list_posts are called late in the React rendering with useEffect.
+         And those fetchings are slow due to database activities. This
+         prefetching will make database connections to happen earlier, and
+         the first real fetching from React component will be faster because
+         the JSON resources are cached (max-age with some seconds).
+
+         There must be better ways to speed up e.g. building a cache on the
+         server side.
+     -->
+    <img src="{{prefetch_url}}" />
   </body>
 </html>

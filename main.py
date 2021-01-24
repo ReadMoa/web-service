@@ -202,8 +202,10 @@ def api_list_posts():
             "post_url": post.post_url,
             "title": post.title,
             "submission_time": post.submission_time,
+            "published_date": post.published_date,
             "main_image_url": post.main_image_url,
-            "description": post.description})
+            "description": post.description,
+            "author": post.author})
     response = make_response(jsonify(posts=posts))
     response.cache_control.max_age = 30
     return response

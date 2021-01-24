@@ -57,13 +57,17 @@ function ImgMediaCard(props) {
         </CardContent>
       </CardActionArea>
       <CardActions>
+        <Button size="small" color="primary" aria-label="작가 {props.author}">
+          {props.author}
+        </Button>
+
         <Button
           size="small"
           color="primary"
           onClick={handleClick}
-          aria-label="포스트 살짝 엿보기"
+          aria-label="포스트 살짝 보기"
         >
-          엿보기
+          살짝 보기
         </Button>
       </CardActions>
     </Card>
@@ -152,8 +156,8 @@ const ListPosts = (props) => {
               description={post.description}
               imageUrl={post.main_image_url}
               postUrl={post.post_url}
-              // Change "/p/" to "http://localhost:8080/p/" for development or test.
               viewPageUrl={"/p/" + post.post_url_hash}
+              author={post.author}
               handleOpenModalView={handleOpenModalView}
               handleSelectPost={setSelectedPost}
               handleViewPageUrl={setViewPageUrl}

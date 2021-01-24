@@ -28,7 +28,7 @@ function WritePost() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ url: url, comment: comment, idtoken: idtoken }),
+      body: JSON.stringify({ url: url, comment: comment }),
     })
       .then((response) => {
         history.push("/");
@@ -43,7 +43,6 @@ function WritePost() {
 
   const [url, setUrl] = useState("");
   const [comment, setComment] = useState("");
-  const [idtoken, setIdtoken] = useState("");
 
   return (
     <div className="App" onSubmit={onSubmit}>

@@ -2,8 +2,10 @@
 
 Provide handlers for APIs, static images/HTMLs.
 """
+import getopt
 import logging
 import os
+import sys
 from urllib.parse import urlparse, urljoin
 
 # For parsing a webpage.
@@ -20,6 +22,8 @@ from util.post_db import PostDB
 # Max post index to return in /api/list_posts
 MAX_POSTS_TO_START = 1000
 DATABASE_MODE = "prod"
+SERVER_HOST_IP = "127.0.0.1"
+SERVER_PORT = 8080
 
 app = Flask(__name__, template_folder='webapp/build')
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -208,7 +212,6 @@ def api_list_posts():
 # {
 #   "url": "..."
 #   "comment": "..."
-#   "idtoken": "..."
 # }
 # TODO: Didn't test this function.
 @app.route('/api/add_post', methods=["POST"])
@@ -309,5 +312,37 @@ def sitemap_xml():
     response.headers['Content-Type'] = 'application/xml'
     return response
 
+def main(argv):
+    """Main entry point.
+
+    Reads and parses RSS feeds. Insert new entries into the post database.
+
+    Args:
+        N/A
+    """
+    mode = "test"
+    enable_debug = True
+    try:
+        opts, _ = getopt.getopt(argv,"hm:d:",["mode=", "debug"])
+    except getopt.GetoptError:
+        # pylint: disable=line-too-long
+        print("main.py -m <mode: prod, dev, test(default)> -f ")
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == "-h":
+            # pylint: disable=line-too-long
+            print("main.py -m <mode: prod, dev, test(default)> -f ")
+            sys.exit()
+        elif opt in ("-m", "--mode"):
+            mode = arg
+            if mode not in ("prod", "dev", "test"):
+                print("Unknown 'mode': %s", mode)
+                sys.exit(2)
+        elif opt in ("-d", "--debug"):
+            enable_debug = True
+
+    app.run(host=SERVER_HOST_IP, port=SERVER_PORT, debug=enable_debug)
+
+
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=8080, debug=True)
+    main(sys.argv[1:])

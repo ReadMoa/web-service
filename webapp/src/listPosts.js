@@ -57,7 +57,12 @@ function ImgMediaCard(props) {
         </CardContent>
       </CardActionArea>
       <CardActions>
-        <Button size="small" color="primary" onClick={handleClick}>
+        <Button
+          size="small"
+          color="primary"
+          onClick={handleClick}
+          aria-label="포스트 살짝 엿보기"
+        >
           엿보기
         </Button>
       </CardActions>
@@ -97,9 +102,9 @@ const ListPosts = (props) => {
           setPosts(response.posts);
           setIsLoaded(true);
         },
-        (error) => {
+        (err) => {
           setIsLoaded(true);
-          setError(error);
+          setError(err);
         }
       )
       .catch((err) => {
@@ -121,9 +126,9 @@ const ListPosts = (props) => {
           setPosts((posts) => posts.concat(response.posts));
           setIsLoaded(true);
         },
-        (error) => {
+        (err) => {
           setIsLoaded(true);
-          setError(error);
+          setError(err);
         }
       )
       .catch((err) => {

@@ -21,7 +21,7 @@ from datetime import timedelta
 import logging
 
 import sqlalchemy
-from util.database import init_connection_engine
+from util.database import Database
 from util.feed import Feed
 
 logger = logging.getLogger()
@@ -67,7 +67,7 @@ class FeedDB:
       ...
     """
     def __init__(self, mode="dev"):
-        self.db_instance = init_connection_engine()
+        self.db_instance = Database.get_instance().connection
         self.mode = mode
 
     def lookup_feed(self, url_key):
@@ -251,7 +251,7 @@ class FeedFetchLogDB:
       ...
     """
     def __init__(self, mode="dev"):
-        self.db_instance = init_connection_engine()
+        self.db_instance = Database.get_instance().connection
         self.mode = mode
 
     def log(

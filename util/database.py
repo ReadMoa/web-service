@@ -15,6 +15,31 @@ import os
 
 import sqlalchemy
 
+class Database:
+    """Singleton Database class to connect SQLServer.
+
+    Database provides a connection to a remote SQLServer.
+
+    Attributes:
+      connection: db instance.
+    """
+    __instance = None
+    @staticmethod
+    def get_instance():
+        """ Static access method. """
+        if Database.__instance is None:
+            Database()
+        return Database.__instance
+
+    def __init__(self):
+        """ Virtually private constructor. """
+        if Database.__instance is not None:
+            raise Exception("This class is a singleton!")
+        else:
+            Database.__instance = self
+            self.connection = init_connection_engine()
+
+
 # pylint: disable=missing-function-docstring
 # The SQLAlchemy engine will help manage interactions, including automatically
 # managing a pool of connections to your database

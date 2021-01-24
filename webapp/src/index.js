@@ -48,13 +48,18 @@ function MainApp() {
             >
               <MenuIcon />
             </IconButton>
-            <Box justifyContent="left" style={{ width: "60%" }}>
+            <Box
+              display="flex"
+              justifyContent="flex-start"
+              style={{ width: "50%" }}
+            >
               <Button href="/">ReadMoa</Button>
             </Box>
-            <Box justifyContent="right" style={{ width: "40%" }}>
-              <Button href="/" color="inherit">
-                홈
-              </Button>
+            <Box
+              display="flex"
+              justifyContent="flex-end"
+              style={{ width: "40%" }}
+            >
               <Button href="/write_post" color="inherit">
                 글추가
               </Button>

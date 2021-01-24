@@ -57,7 +57,12 @@ function ImgMediaCard(props) {
         </CardContent>
       </CardActionArea>
       <CardActions>
-        <Button size="small" color="primary" onClick={handleClick}>
+        <Button
+          size="small"
+          color="primary"
+          onClick={handleClick}
+          aria-label="포스트 살짝 엿보기"
+        >
           엿보기
         </Button>
       </CardActions>

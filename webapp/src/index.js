@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   menuButton: {
-    marginRight: theme.spacing(2),
+    marginRight: theme.spacing(1),
   },
   title: {
     flexGrow: 1,
@@ -39,29 +39,29 @@ function MainApp() {
   return (
     <Router>
       <div style={{ width: "100%" }}>
-        <Box display="flex" justifyContent="center">
-          <AppBar position="static">
-            <Toolbar>
-              <IconButton
-                edge="start"
-                className={classes.menuButton}
-                color="inherit"
-                aria-label="menu"
-              >
-                <MenuIcon />
-              </IconButton>
-              <Typography variant="h6" className={classes.title}>
-                ReadMoa
-              </Typography>
+        <AppBar position="static">
+          <Toolbar variant="dense">
+            <IconButton
+              edge="start"
+              className={classes.menuButton}
+              color="inherit"
+              aria-label="menu"
+            >
+              <MenuIcon />
+            </IconButton>
+            <Box justifyContent="left" style={{ width: "60%" }}>
+              <Button href="/">ReadMoa</Button>
+            </Box>
+            <Box justifyContent="right" style={{ width: "40%" }}>
               <Button href="/" color="inherit">
                 홈
               </Button>
               <Button href="/write_post" color="inherit">
                 글추가
               </Button>
-            </Toolbar>
-          </AppBar>
-        </Box>
+            </Box>
+          </Toolbar>
+        </AppBar>
 
         <Box display="flex" justifyContent="center">
           <Switch>

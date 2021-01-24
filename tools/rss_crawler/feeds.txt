@@ -309,3 +309,12 @@ https://brunch.co.kr/rss/@@m9T
 # 폰토그래퍼 김두혁(Brunch) - 여행
 https://brunch.co.kr/rss/@@3jF
 
+# Jan. 21, 2021
+# 윤직원(Brunch) - 방송
+https://brunch.co.kr/rss/@@4nZ
+# 마음달 안정현(Brunch) - 심리, 상담
+https://brunch.co.kr/rss/@@lR2
+# 고수리(Brunch) - 에세이
+https://brunch.co.kr/rss/@@5z4
+# 한재우(Brunch) - 에세이
+https://brunch.co.kr/rss/@@bAz 

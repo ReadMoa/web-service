@@ -11,7 +11,6 @@ import * as serviceWorker from "./serviceWorker";
 import MenuIcon from "@material-ui/icons/Menu";
 import { makeStyles } from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
 
 // Custom resources.
 import "./index.css";

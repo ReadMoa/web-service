@@ -212,7 +212,6 @@ def api_list_posts():
 # {
 #   "url": "..."
 #   "comment": "..."
-#   "idtoken": "..."
 # }
 # TODO: Didn't test this function.
 @app.route('/api/add_post', methods=["POST"])

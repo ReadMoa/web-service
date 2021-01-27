@@ -39,7 +39,7 @@ function ImgMediaCard(props) {
 
   return (
     <Card className={classes.box}>
-      <CardActionArea className={classes.root} onClick={handleClick}>
+      <CardActionArea className={classes.root} href={props.viewPageUrl}>
         <CardMedia
           component="img"
           alt={props.title}

@@ -17,6 +17,7 @@ import "./index.css";
 import ListPosts from "./listPosts";
 import WritePost from "./writePost";
 import ViewPost from "./viewPost";
+import { Typography } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -54,6 +55,9 @@ function MainApp() {
               style={{ width: "50%" }}
             >
               <Button href="/">ReadMoa</Button>
+              <Typography variant="body2" color="textSecondary" component="p">
+                <i>beta</i>
+              </Typography>
             </Box>
             <Box
               display="flex"

@@ -7,8 +7,9 @@ appengine-generated/
 
 # ReadMoa-specific
 app.standard.prod.yaml
-serving/
-test/
+/serving/
+!tools/serving/
+/test/
 
 ###############################################################################
 #  Python

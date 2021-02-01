@@ -1,6 +1,7 @@
 #!/bin/bash
 #
-# $ ./tools/rss_crawler/add_feeds.sh test ./tools/rss_crawler/feeds.txt
+# Should execute under the root directory (web-service)
+# $ ./tools/serving/update_serving_data.sh test
 
 echo "----------------------------------------------"
 echo "START updating serving storage"
@@ -8,15 +9,10 @@ echo "----------------------------------------------"
 
 START=$(date +%s)
 
+# Take the first argument as 'mode'
 mode=$1
-filename=$2
-while read line; do
-    [[ "$line" =~ ^#.*$ ]] && continue
-    [ -z "$line" ] && continue
-    # reading each line
-    echo Insert into Feeds table: $line
-    PYTHONPATH=./ python3 tools/database/add_a_feed.py --mode=$mode --url=$line
-done < $filename
+# Run the command.
+PYTHONPATH=./ python3 tools/serving/update_serving_data.py --mode=$mode 
 
 END=$(date +%s)
 DIFF=$(echo "$END - $START" | bc)

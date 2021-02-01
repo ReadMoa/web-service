@@ -18,7 +18,6 @@ from datetime import datetime
 from util.url import url_to_hashkey
 from util.page_metadata import fetch_main_image_from_post
 
-
 class Post:
     """Post class to hold a post record.
 

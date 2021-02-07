@@ -1,7 +1,7 @@
 """Delete a post from a Post table
 
 Commands:
-$ PYTHONPATH=./ python3 tools/database_management/delete_post.py \n
+$ PYTHONPATH=./ python3 tools/database/delete_post.py \n
   --mode=test --key=deadbeefdeadbeefdeadbeef
 """
 import getopt

@@ -51,8 +51,8 @@ class PostDB:
         with self.db_instance.connect() as conn:
             # Execute the query and fetch all results
             returned_posts = conn.execute("""
-                SELECT post_url_hash, post_url, post_author, post_author_hash,
-                       post_published_date, title, submission_time,
+                SELECT post_url_hash, post_url, title, post_author, post_author_hash,
+                       post_published_date, submission_time,
                        main_image_url, description, user_display_name,
                        user_email, user_photo_url, user_id, user_provider_id 
                 FROM {mode}_posts_serving 

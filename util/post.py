@@ -15,7 +15,7 @@
 """
 from datetime import datetime
 
-from util.url import url_to_hashkey
+from util.url import author_to_hashkey, url_to_hashkey
 from util.page_metadata import fetch_main_image_from_post
 
 class Post:
@@ -28,7 +28,8 @@ class Post:
       Various fields (see the first __init__ function).
     """
     def __init__(
-        self, post_url, title, author, published_date, main_image_url = "",
+        self, post_url, title, author, published_date, author_hash = "",
+        main_image_url = "",
         description = "", user_display_name = "리드모아",
         user_email = "admin@readmoa.net",
         user_photo_url = "/static/readmoa_profile.png",
@@ -39,6 +40,10 @@ class Post:
         self.key = self.post_url_hash
         self.title = title
         self.author = author
+        if author_hash == "":
+            self.author_hash = author_to_hashkey(author)
+        else:
+            self.author_hash = author_hash
         self.published_date = published_date
         self.main_image_url = main_image_url
         self.description = description
@@ -57,6 +62,7 @@ class Post:
         """
         return f"""POST({self.key})
         title: {self.title}
+        author: {self.author}
         url: {self.post_url}
         main_image_url: {self.main_image_url}
         description: {self.description}

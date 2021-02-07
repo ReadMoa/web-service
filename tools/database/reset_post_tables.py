@@ -41,6 +41,7 @@ def create_tables(db_instance, mode, dryrun):
             post_url_hash CHAR(24) NOT NULL, 
             post_url  TEXT(2084) NOT NULL, 
             post_author VARCHAR(255),
+            post_author_hash CHAR(16) NOT NULL,
             post_published_date DATETIME,
             submission_time DATETIME, 
             title TEXT(1024), 

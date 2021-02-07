@@ -1,2 +1,4 @@
 # Feed type: RSS
-https://brunch.co.kr/rss/@@1Kt0
+#https://brunch.co.kr/rss/@@1Kt0
+https://rss.blog.naver.com/dicagallery.xml
+https://rss.blog.naver.com/baby0817.xml

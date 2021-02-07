@@ -132,6 +132,8 @@ const ListPostsByAuthor = (props) => {
     const currentPath = location.pathname;
     if (currentPath.startsWith("/a/")) {
       setAuthorKey(currentPath.substring(3));
+    } else {
+      console.log("Bad path to parse: " + location.pathname);
     }
   }, [location]);
 

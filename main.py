@@ -128,19 +128,15 @@ def author_page(path):
     Renders posts by author key.
 
     Args:
-      path: 64bit (16 hexadecimal digits) post key.
+      path: 64bit (16 hexadecimal digits) author key (post.author_key).
     """
-    author = {
-        "name": "",
-        "key": ""}
-
     # TODO: Populate this post.
     post = Post(
             post_url="", author="", title="작가의 글 목록",
             description="작가의 글 목록입니다.",
             published_date=None)
 
-    return render_template("index.html", author=author, post=post)
+    return render_template("index.html", post=post)
 
 @app.route("/write_post", methods=["GET"])
 def write_post():

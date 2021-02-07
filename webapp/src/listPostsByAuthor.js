@@ -1,6 +1,7 @@
 // @flow
 import React, { useEffect, useState } from "react";
-import "./listPosts.css";
+import { useLocation } from "react-router-dom";
+import "./listPostsByAuthor.css";
 
 import Box from "@material-ui/core/Box";
 import Button from "@material-ui/core/Button";
@@ -58,12 +59,7 @@ function ImgMediaCard(props) {
           </CardContent>
         </CardActionArea>
         <CardActions>
-          <Button
-            size="small"
-            color="primary"
-            aria-label="작가 {props.author}"
-            href={props.listPostsByAuthorUrl}
-          >
+          <Button size="small" color="primary" aria-label="작가 {props.author}">
             {props.author}
           </Button>
           <Button
@@ -91,12 +87,7 @@ function ImgMediaCard(props) {
           </CardContent>
         </CardActionArea>
         <CardActions>
-          <Button
-            size="small"
-            color="primary"
-            aria-label="작가 {props.author}"
-            href={props.listPostsByAuthorUrl}
-          >
+          <Button size="small" color="primary" aria-label="작가 {props.author}">
             {props.author}
           </Button>
           <Button
@@ -113,11 +104,12 @@ function ImgMediaCard(props) {
   }
 }
 
-const ListPosts = (props) => {
+const ListPostsByAuthor = (props) => {
   const [posts, setPosts] = useState(Array.from({ length: 0 }));
   const [, setError] = useState(null);
   const [, setIsLoaded] = useState(false);
   const style = useStyles();
+  const [authorKey, setAuthorKey] = useState("");
 
   // 'open' state indicates (or triggers) to open the InstantViewPost modal
   // dialog.
@@ -135,8 +127,16 @@ const ListPosts = (props) => {
     setOpen(false);
   };
 
+  const location = useLocation();
   useEffect(() => {
-    fetch(getApiServerPath() + "list_posts", {
+    const currentPath = location.pathname;
+    if (currentPath.startsWith("/a/")) {
+      setAuthorKey(currentPath.substring(3));
+    }
+  }, [location]);
+
+  useEffect(() => {
+    fetch(getApiServerPath() + "list_posts?author=" + authorKey, {
       method: "GET",
     })
       .then((response) => response.json())
@@ -153,11 +153,16 @@ const ListPosts = (props) => {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [authorKey]);
 
   const fetchMoreData = () => {
     const url =
-      getApiServerPath() + "list_posts?start=" + posts.length + "&count=10";
+      getApiServerPath() +
+      "list_posts?author=" +
+      authorKey +
+      "&start=" +
+      posts.length +
+      "&count=10";
 
     fetch(url, {
       method: "GET",
@@ -196,7 +201,6 @@ const ListPosts = (props) => {
               imageUrl={post.main_image_url}
               postUrl={post.post_url}
               viewPageUrl={"/p/" + post.post_url_hash}
-              listPostsByAuthorUrl={"/a/" + post.author_key}
               author={post.author}
               handleOpenModalView={handleOpenModalView}
               handleSelectPost={setSelectedPost}
@@ -216,4 +220,4 @@ const ListPosts = (props) => {
   );
 };
 
-export default ListPosts;
+export default ListPostsByAuthor;

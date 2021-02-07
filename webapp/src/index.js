@@ -15,6 +15,7 @@ import Toolbar from "@material-ui/core/Toolbar";
 // Custom resources.
 import "./index.css";
 import ListPosts from "./listPosts";
+import ListPostsByAuthor from "./listPostsByAuthor";
 import WritePost from "./writePost";
 import ViewPost from "./viewPost";
 import { Typography } from "@material-ui/core";
@@ -34,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
 function MainApp() {
   const classes = useStyles();
 
-  const el = document.getElementById("root");
+  const root_elem = document.getElementById("root");
 
   return (
     <Router>
@@ -74,7 +75,10 @@ function MainApp() {
         <Box display="flex" justifyContent="center">
           <Switch>
             <Route path="/p/:post_url_key">
-              <ViewPost message={el.getAttribute("data-param")} />
+              <ViewPost message={root_elem.getAttribute("data-param")} />
+            </Route>
+            <Route path="/a/:author_key">
+              <ListPostsByAuthor />
             </Route>
             <Route path="/write_post">
               <WritePost />

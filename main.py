@@ -121,6 +121,27 @@ def view_page(path):
 
     return render_template("index.html", post=post)
 
+@app.route("/a/<path:path>", methods=["GET"])
+def author_page(path):
+    """Renders posts by author page (/a/).
+
+    Renders posts by author key.
+
+    Args:
+      path: 64bit (16 hexadecimal digits) post key.
+    """
+    author = {
+        "name": "",
+        "key": ""}
+
+    # TODO: Populate this post.
+    post = Post(
+            post_url="", author="", title="작가의 글 목록",
+            description="작가의 글 목록입니다.",
+            published_date=None)
+
+    return render_template("index.html", author=author, post=post)
+
 @app.route("/write_post", methods=["GET"])
 def write_post():
     """Renders write_post page.
@@ -177,7 +198,8 @@ def get_full_url(parent_url, og_url):
 def api_list_posts():
     """Returns a list of recent posts.
 
-    Request params
+    Request params:
+      author: author key to filter posts.
       start: the start index of recent posts (ordered by submission time).
       count: number of posts to return.
     """
@@ -193,7 +215,12 @@ def api_list_posts():
     if request.args.get("count") is not None:
         count = int(request.args.get("count"))
 
-    recent_posts = post_db.scan(start_idx=start_idx, count=count)
+    author_key = ""
+    if request.args.get("author") is not None:
+        author_key = request.args.get("author")
+
+    recent_posts = post_db.scan(
+        author_key=author_key, start_idx=start_idx, count=count)
 
     posts = []
     for post in recent_posts:
@@ -205,7 +232,8 @@ def api_list_posts():
             "published_date": post.published_date,
             "main_image_url": post.main_image_url,
             "description": post.description,
-            "author": post.author})
+            "author": post.author,
+            "author_key": post.author_hash})
     response = make_response(jsonify(posts=posts))
     response.cache_control.max_age = 30
     return response
@@ -215,7 +243,6 @@ def api_list_posts():
 #   "url": "..."
 #   "comment": "..."
 # }
-# TODO: Didn't test this function.
 @app.route('/api/add_post', methods=["POST"])
 def api_add_post():
     """Flask handler for /api/add_post request.

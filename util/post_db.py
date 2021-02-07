@@ -71,12 +71,13 @@ class PostDB:
                     user_id=row[12], user_provider_id=row[13])
         return post
 
-    def scan(self, start_idx=0, count=10):
+    def scan(self, author_key="", start_idx=0, count=10):
         """Scans posts table and resturns a list of Post instances.
 
         Posts of [start_idx, start_idx + count) records will be returned.
 
         Args:
+          author_key: return posts written by the 'author' if not empty.
           start_idx: The start index of the scan.
           count: # of posts to return
 
@@ -97,16 +98,24 @@ class PostDB:
             return posts  # Empty list
 
         with self.db_instance.connect() as conn:
-            # Execute the query and fetch all results
-            recent_posts = conn.execute("""
+            where_str = ""
+            if author_key:
+                where_str = "where post_author_hash = '" + author_key + "'"
+
+            sql_str = """
                 SELECT post_url_hash, post_url, title, post_author,
                     post_author_hash, post_published_date, submission_time,
                     main_image_url, description, user_display_name, user_email,
                     user_photo_url, user_id, user_provider_id 
                 FROM {mode}_posts_serving 
+                {where_clause}
                 ORDER BY submission_time DESC LIMIT {limit:d}
-                """.format(mode=self.mode, limit=start_idx + count)
-            ).fetchall()
+                """.format(
+                    mode=self.mode, where_clause=where_str,
+                    limit=start_idx + count)
+
+            # Execute the query and fetch all results
+            recent_posts = conn.execute(sql_str).fetchall()
 
             if len(recent_posts) > start_idx:
                 for row in recent_posts[start_idx:]:

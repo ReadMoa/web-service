@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# $ ./tools/rss_crawler/add_feeds.sh test ./tools/rss_crawler/feeds.txt
+# $ ./tools/database/add_feeds.sh test ./tools/rss_crawler/feeds.txt
 
 echo "----------------------------------------------"
 echo "START updating serving storage"

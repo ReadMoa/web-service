@@ -48,6 +48,24 @@ def extract_from_post(html_text):
     logger.info("Extracted summary: %s", summary[:MAX_SUMMARY_LENGTH])
     return summary[:MAX_SUMMARY_LENGTH]
 
+def extract_from_cdata(txt):
+    """Extracts text from CDATA.
+
+    Args:
+      txt: A CDATA string. e.g. <![CDATA[Test]]>
+
+    Returns:
+      An extracted string from the input CDATA string.
+    """
+    result = ""
+    soup = BeautifulSoup.BeautifulSoup(txt)
+    for cdata in soup.findAll(text=True):
+        if isinstance(cdata, BeautifulSoup.CData):
+            result += "{} ".format(html.unescape(repr(cdata)))
+        else:
+            result += "{}".format(html.unescape(cdata))
+    return result
+
 # <rss version="2.0">
 #   <channel>
 class RssReader:
@@ -63,9 +81,12 @@ class RssReader:
         channel = self.feed_soup.rss.channel
         self.author = ""
         self.title = channel.title.text
-        self.description = channel.description.text
-        self.language = channel.language.text
-        self.generator = channel.generator.text
+        if channel.description:
+            self.description = channel.description.text
+        if channel.language:
+            self.language = channel.language.text
+        if channel.generator:
+            self.generator = channel.generator.text
 
     def read(self, count=1):
         """Parses the RSS feed and returns 'count' number of items.
@@ -93,6 +114,13 @@ class RssReader:
             author = ""
             if i.find("author"):
                 author = html.unescape(i.find("author").get_text())
+            elif i.find("dc:creator"):
+                # Example: <dc:creator><![CDATA[Test Lee]]></dc:creator>
+                author_src_text = i.find("dc:creator").get_text().strip()
+                if author_src_text.startswith("<![CDATA["):
+                    author = extract_from_cdata(author_src_text)
+                else:
+                    author = author_src_text
 
             title = html.unescape(i.title.text)
             description = extract_from_post(i.description.text)

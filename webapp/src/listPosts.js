@@ -38,6 +38,7 @@ function ImgMediaCard(props) {
   }
 
   if (props.imageUrl !== "") {
+    // TODO: Refactor this code to remove duplicate blocks.
     return (
       <Card className={classes.box}>
         <CardActionArea className={classes.root} href={props.viewPageUrl}>

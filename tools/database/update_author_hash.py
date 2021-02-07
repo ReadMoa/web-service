@@ -37,7 +37,6 @@ def main(argv):
         elif opt in ("-n", "--nodryrun"):
             dryrun = False
 
-
     post_db = PostDB(mode=mode)
 
     start_idx = 0

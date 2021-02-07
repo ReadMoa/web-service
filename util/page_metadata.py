@@ -33,18 +33,22 @@ def fetch_main_image_from_post(page_url):
     source_code = requests.get(page_url).text
     main_soup = BeautifulSoup(source_code, "html.parser")
 
+    main_image = ""
+
     # Crawl and parse a webpage.
     if (page_url.startswith("https://blog.naver.com")
         or page_url.startswith("http://blog.naver.com")):
-        main_frame_url = main_soup.find(id="mainFrame")["src"]
-        main_frame_url = "https://blog.naver.com" + main_frame_url
-        logger.info("Naver blog's main frame: %s", main_frame_url)
+        # Images on Naver blog have strict-origin-when-cross-origin referrer
+        # policy. The images can't be embedded on a third-party site.
+        return main_image
+        # main_frame_url = main_soup.find(id="mainFrame")["src"]
+        # main_frame_url = "https://blog.naver.com" + main_frame_url
+        # logger.info("Naver blog's main frame: %s", main_frame_url)
+        #
+        # time.sleep(FETCH_DELAY_SECS)
+        # main_frame_source_code = requests.get(main_frame_url).text
+        # main_soup = BeautifulSoup(main_frame_source_code, "html.parser")
 
-        time.sleep(FETCH_DELAY_SECS)
-        main_frame_source_code = requests.get(main_frame_url).text
-        main_soup = BeautifulSoup(main_frame_source_code, "html.parser")
-
-    main_image = ""
     for each_text in main_soup.findAll("meta"):
         if each_text.get("property") == "og:image":
             main_image = each_text.get("content")

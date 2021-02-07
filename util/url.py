@@ -17,4 +17,15 @@ def url_to_hashkey(url):
       A 96 bit hash key.
     """
     return hashlib.sha512(url.encode()).hexdigest()[0:24]
-    
+
+def author_to_hashkey(author):
+    """Generate a 64 bit hash key from an author string.
+
+    Args:
+      author: An author string.
+
+    Returns:
+      A 96 bit hash key.
+    """
+    # Unicode characters like 'author' must be encoded before hashing.
+    return hashlib.sha512(author.encode()).hexdigest()[0:16]

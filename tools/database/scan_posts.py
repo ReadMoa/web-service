@@ -49,11 +49,14 @@ def main(argv):
         if output == "verbose":
             print("""Post[{key}] {url}
     Title: {title}
-    Author: {author}
+    Author: {author} ({author_hash})
+    Main image: {main_image}
     Published date: {published_date}
     Submission time: {submission_time}""".format(
                         key=post.key, url=post.post_url,
-                        author=post.author, published_date=post.published_date,
+                        author=post.author, author_hash=post.author_hash,
+                        main_image=post.main_image_url,
+                        published_date=post.published_date,
                         title=post.title, submission_time=post.submission_time))
         else:
             print("Post[{key}] {url}".format(key=post.key, url=post.post_url))

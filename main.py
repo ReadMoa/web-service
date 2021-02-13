@@ -24,6 +24,7 @@ MAX_POSTS_TO_START = 1000
 DATABASE_MODE = "prod"
 SERVER_HOST_IP = "127.0.0.1"
 SERVER_PORT = 8080
+LIST_API_MAX_AGE_SECONDS = 360  # 6 minutes
 
 app = Flask(__name__, template_folder='webapp/build')
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
@@ -231,7 +232,7 @@ def api_list_posts():
             "author": post.author,
             "author_key": post.author_hash})
     response = make_response(jsonify(posts=posts))
-    response.cache_control.max_age = 30
+    response.cache_control.max_age = LIST_API_MAX_AGE_SECONDS
     return response
 
 # JSON data format for request.
@@ -302,7 +303,7 @@ def api_add_post():
             "main_image_url": post.main_image_url,
             "description": post.description}
     response = make_response(jsonify(post=return_post))
-    response.cache_control.max_age = 30
+    response.cache_control.max_age = LIST_API_MAX_AGE_SECONDS
     return response
 
 @app.route('/sitemap.xml')

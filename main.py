@@ -21,7 +21,6 @@ from util.post_db import PostDB
 
 # Max post index to return in /api/list_posts
 MAX_POSTS_TO_START = 1000
-DATABASE_MODE = "prod"
 SERVER_HOST_IP = "127.0.0.1"
 SERVER_PORT = 8080
 LIST_API_MAX_AGE_SECONDS = 360  # 6 minutes
@@ -30,7 +29,7 @@ app = Flask(__name__, template_folder='webapp/build')
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 logger = logging.getLogger()
 
-post_db = PostDB(DATABASE_MODE)
+post_db = None
 
 @app.before_first_request
 def google_service_init():
@@ -346,7 +345,7 @@ def main(argv):
     Args:
         N/A
     """
-    mode = "test"
+    mode = "prod"
     enable_debug = True
     try:
         opts, _ = getopt.getopt(argv,"hm:d:",["mode=", "debug"])
@@ -367,6 +366,9 @@ def main(argv):
         elif opt in ("-d", "--debug"):
             enable_debug = True
 
+    # TODO: Find a solution to encapsulate this global variable into 'app'?
+    global post_db
+    post_db = PostDB(mode)
     app.run(host=SERVER_HOST_IP, port=SERVER_PORT, debug=enable_debug)
 
 

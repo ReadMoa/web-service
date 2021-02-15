@@ -58,10 +58,10 @@ def extract_from_cdata(txt):
       An extracted string from the input CDATA string.
     """
     result = ""
-    soup = BeautifulSoup.BeautifulSoup(txt)
+    soup = BeautifulSoup(txt, "xml")
     for cdata in soup.findAll(text=True):
         if isinstance(cdata, BeautifulSoup.CData):
-            result += "{} ".format(html.unescape(repr(cdata)))
+            result += "{}".format(html.unescape(repr(cdata)))
         else:
             result += "{}".format(html.unescape(cdata))
     return result

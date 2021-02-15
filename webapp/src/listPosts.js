@@ -25,6 +25,21 @@ const useStyles = makeStyles({
   },
 });
 
+function ImgMediaCardMediaSection(props) {
+  if (props.imageUrl !== "") {
+    return (
+      <CardMedia
+        component="img"
+        alt={props.title}
+        height="200"
+        image={props.imageUrl}
+        title={props.title}
+      />
+    );
+  }
+  return null;
+}
+
 function ImgMediaCard(props) {
   const classes = useStyles();
 
@@ -37,81 +52,39 @@ function ImgMediaCard(props) {
     props.handleViewPageUrl(props.viewPageUrl);
   }
 
-  if (props.imageUrl !== "") {
-    // TODO: Refactor this code to remove duplicate blocks.
-    return (
-      <Card className={classes.box}>
-        <CardActionArea className={classes.root} href={props.viewPageUrl}>
-          <CardMedia
-            component="img"
-            alt={props.title}
-            height="200"
-            image={props.imageUrl}
-            title={props.title}
-          />
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="h2">
-              {props.title}
-            </Typography>
-            <Typography variant="body2" color="textSecondary" component="p">
-              {props.description}
-            </Typography>
-          </CardContent>
-        </CardActionArea>
-        <CardActions>
-          <Button
-            size="small"
-            color="primary"
-            aria-label="작가 {props.author}"
-            href={props.listPostsByAuthorUrl}
-          >
-            {props.author}
-          </Button>
-          <Button
-            size="small"
-            color="primary"
-            onClick={handleClick}
-            aria-label="포스트 살짝 보기"
-          >
-            살짝 보기
-          </Button>
-        </CardActions>
-      </Card>
-    );
-  } else {
-    return (
-      <Card className={classes.box}>
-        <CardActionArea className={classes.root} href={props.viewPageUrl}>
-          <CardContent>
-            <Typography gutterBottom variant="h5" component="h2">
-              {props.title}
-            </Typography>
-            <Typography variant="body2" color="textSecondary" component="p">
-              {props.description}
-            </Typography>
-          </CardContent>
-        </CardActionArea>
-        <CardActions>
-          <Button
-            size="small"
-            color="primary"
-            aria-label="작가 {props.author}"
-            href={props.listPostsByAuthorUrl}
-          >
-            {props.author}
-          </Button>
-          <Button
-            size="small"
-            color="primary"
-            onClick={handleClick}
-            aria-label="포스트 살짝 보기"
-          >
-            살짝 보기
-          </Button>
-        </CardActions>
-      </Card>
-    );
-  }
+  return (
+    <Card className={classes.box}>
+      <CardActionArea className={classes.root} href={props.viewPageUrl}>
+        <ImgMediaCardMediaSection imageUrl={props.imageUrl} />
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="h2">
+            {props.title}
+          </Typography>
+          <Typography variant="body2" color="textSecondary" component="p">
+            {props.description}
+          </Typography>
+        </CardContent>
+      </CardActionArea>
+      <CardActions>
+        <Button
+          size="small"
+          color="primary"
+          aria-label="작가 {props.author}"
+          href={props.listPostsByAuthorUrl}
+        >
+          {props.author}
+        </Button>
+        <Button
+          size="small"
+          color="primary"
+          onClick={handleClick}
+          aria-label="포스트 살짝 보기"
+        >
+          살짝 보기
+        </Button>
+      </CardActions>
+    </Card>
+  );
 }
 
 const ListPosts = (props) => {

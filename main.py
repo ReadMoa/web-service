@@ -23,13 +23,14 @@ from util.post_db import PostDB
 MAX_POSTS_TO_START = 1000
 SERVER_HOST_IP = "127.0.0.1"
 SERVER_PORT = 8080
-LIST_API_MAX_AGE_SECONDS = 360  # 6 minutes
+LIST_API_MAX_AGE_SECONDS = 60  # 1 minute
 
 app = Flask(__name__, template_folder='webapp/build')
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 logger = logging.getLogger()
 
-post_db = None
+# TODO: Find a solution to encapsulate this global variable into 'app'?
+post_db = PostDB("prod")
 
 @app.before_first_request
 def google_service_init():
@@ -366,9 +367,6 @@ def main(argv):
         elif opt in ("-d", "--debug"):
             enable_debug = True
 
-    # TODO: Find a solution to encapsulate this global variable into 'app'?
-    global post_db
-    post_db = PostDB(mode)
     app.run(host=SERVER_HOST_IP, port=SERVER_PORT, debug=enable_debug)
 
 

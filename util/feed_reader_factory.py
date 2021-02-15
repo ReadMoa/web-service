@@ -66,6 +66,18 @@ def extract_from_cdata(txt):
             result += "{}".format(html.unescape(cdata))
     return result
 
+def is_tistory(url):
+    """True if it's a Tistory blog.
+
+    Args:
+      url: A URL string.
+
+    Returns:
+      True if Tistory.
+    """
+    t = urlparse(url).netloc
+    return ".".join(t.split(".")[1:]) == "tistory.com"
+
 # <rss version="2.0">
 #   <channel>
 class RssReader:
@@ -74,7 +86,8 @@ class RssReader:
     Attributes:
       feed_content: The content of the feed.
     """
-    def __init__(self, feed_content):
+    def __init__(self, url, feed_content):
+        self.url = url
         self.feed_content = feed_content
         self.feed_soup = BeautifulSoup(self.feed_content, "xml")
 
@@ -125,6 +138,13 @@ class RssReader:
             title = html.unescape(i.title.text)
             description = extract_from_post(i.description.text)
 
+            if is_tistory(self.url):
+                # The last two characters of "(adsbygoogle = window.adsbygoogle || []).push({});"
+                start_idx = description.find(");")
+                start_idx = 0 if start_idx < 0 else start_idx + 2
+                description = description[start_idx:]
+
+            description = description.strip()
             items.append(FeedItem(
                 url=url, title=title, description=description,
                 published_date=updated, author=author))
@@ -140,7 +160,8 @@ class AtomReader:
     Attributes:
       feed_content: The content of the feed.
     """
-    def __init__(self, feed_content):
+    def __init__(self, url, feed_content):
+        self.url = url
         self.feed_content = feed_content
         self.feed_soup = BeautifulSoup(self.feed_content, "xml")
 
@@ -176,6 +197,8 @@ class AtomReader:
             description = extract_from_post(i.find("summary").get_text())
             title = html.unescape(i.find("title").get_text())
 
+            description = description.strip()
+            
             items.append(FeedItem(
                 url=url, title=title, description=description,
                 published_date=updated, author=author))
@@ -233,9 +256,9 @@ class FeedReaderFactory:
           A feed reader object.
         """
         if feed_type == "RSS":
-            return RssReader(feed_content=feed_content)
+            return RssReader(url=url, feed_content=feed_content)
         elif feed_type == "ATOM":
-            return AtomReader(feed_content=feed_content)
+            return AtomReader(url=url, feed_content=feed_content)
         elif feed_type == "SITEMAP":
             # Not implemented.
             return None

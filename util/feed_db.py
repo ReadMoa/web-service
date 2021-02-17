@@ -329,3 +329,25 @@ class FeedFetchLogDB:
                     "previous_changerate":row[4],
                     "previous_scheduled_fetch_time":row[5]})
         return events
+
+    def delete_by_feed(self, feed_key):
+        """Delete logs by a feed.
+
+        Args:
+          feed_key (string): A feed key.
+
+        Returns:
+          A list of logs.
+        """
+        events = []
+        try:
+            with self.db_instance.connect() as conn:
+                # Execute the query and fetch all results
+                conn.execute("""
+                    DELETE 
+                    FROM {mode}_feed_fetch_log
+                    where url_key = '{url_key}'
+                    """.format(mode=self.mode, url_key=feed_key))
+        except self.db_instance.Error as ex:
+            logger.exception(ex)
+            return

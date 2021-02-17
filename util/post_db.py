@@ -18,6 +18,7 @@
 import logging
 
 import sqlalchemy
+
 from util.database import Database
 from util.post import Post
 

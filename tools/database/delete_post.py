@@ -19,12 +19,12 @@ def main(argv):
         opts, _ = getopt.getopt(argv,"hm:k:",["mode=","key="])
     except getopt.GetoptError:
         # pylint: disable=line-too-long
-        print("scan_posts.py -m <mode: prod, dev, test(default)> -k <key>")
+        print("delete_post.py -m <mode: prod, dev, test(default)> -k <key>")
         sys.exit(2)
     for opt, arg in opts:
         if opt == "-h":
             # pylint: disable=line-too-long
-            print("scan_posts.py -m <mode: prod, dev, test(default)> -k <key>")
+            print("delete_post.py -m <mode: prod, dev, test(default)> -k <key>")
             sys.exit()
         elif opt in ("-m", "--mode"):
             mode = arg
